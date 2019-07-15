@@ -11,6 +11,8 @@ def parse_argv(argv):
         type=int, metavar='pool_size', default=2)
     parser.add_argument('-dense', help='configure units of dense layer ex. 128',
         type=int, metavar='units', default=128)
+    parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
+        default='statistics.csv')
 
     args = parser.parse_args()
 
