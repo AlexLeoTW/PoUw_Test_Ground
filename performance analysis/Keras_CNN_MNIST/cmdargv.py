@@ -1,7 +1,8 @@
-import argparse, sys, os
+import argparse, sys, os, time
 
 def parse_argv(argv):
     parser = argparse.ArgumentParser()
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
 
     parser.add_argument('-conv1', help='configure first Conv2D layer ex. 32 2',
         nargs='+', type=int, metavar=('filters', 'kernel_size'), default=[32, 2])
@@ -11,10 +12,32 @@ def parse_argv(argv):
         type=int, metavar='pool_size', default=2)
     parser.add_argument('-dense', help='configure units of dense layer ex. 128',
         type=int, metavar='units', default=128)
+    parser.add_argument('-l', '--log', help='save detailed trainning log (.csv file)',
+        dest='log_path', metavar='path')
+        # default: [conv1_filters]_[conv1_kernel_size]_[conv2]_[pool_size]_[dense]_[timestamp].csv
+    parser.add_argument('-m', '--model', help='save trainned moldel (.h5)',
+        dest='model_path', metavar='path')
+        # default: [conv1_filters]_[conv1_kernel_size]_[conv2]_[pool_size]_[dense]_[timestamp].h5
     parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
-        default='statistics.csv')
+        dest='statistics_path', metavar='path', default='statistics.csv')
 
     args = parser.parse_args()
+
+    if args.log_path == None:
+        args.log_path = '{}_{}_{}_{}_{}_{}.csv'.format(
+            args.conv1[0],  args.conv1[1],      args.conv2, args.pool,  args.dense, timestamp
+          # [conv1_filters] [conv1_kernel_size] [conv2]     [pool_size] [dense]     [timestamp]
+        )
+
+    if args.model_path == None:
+        args.model_path = '{}_{}_{}_{}_{}_{}.h5'.format(
+            args.conv1[0],  args.conv1[1],      args.conv2, args.pool,  args.dense, timestamp
+          # [conv1_filters] [conv1_kernel_size] [conv2]     [pool_size] [dense]     [timestamp]
+        )
+
+    args.log_path = os.path.abspath(args.log_path)
+    args.model_path = os.path.abspath(args.model_path)
+    args.statistics_path = os.path.abspath(args.statistics_path)
 
     return args
 

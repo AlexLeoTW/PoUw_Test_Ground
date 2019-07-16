@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 keras = "~=2.2"
 tensorflow = "~=1.14"
+sklearn = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.6"
