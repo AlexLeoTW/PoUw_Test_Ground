@@ -8,8 +8,8 @@ class CustomLogger(keras.callbacks.Callback):
     def __init__(self, path=None, metrics=metrics):
         super(CustomLogger, self).__init__()
 
-        logfile = open(path, 'w', newline='')
-        self.csv = csv.DictWriter(logfile, fieldnames=metrics)
+        self.logfile = open(path, 'w', newline='')
+        self.csv = csv.DictWriter(self.logfile, fieldnames=metrics)
         self.csv.writeheader()
 
         self.metrics = metrics
@@ -32,10 +32,11 @@ class CustomLogger(keras.callbacks.Callback):
         new_row = {}
         for metrix in self.metrics:
             new_row[metrix] = logs[metrix] if metrix in logs else float('nan')
-            self.result[metrix] = new_row[metrix]
+            self.result[metrix].append(new_row[metrix])
 
         self.csv.writerow(new_row)
 
     def on_train_end(self, logs={}):
+        self.logfile.close()
         self.train_end = time.time()
         self.train_time = self.train_end - self.train_begin
