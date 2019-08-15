@@ -1,0 +1,39 @@
+import numpy as np
+from keras.utils import to_categorical
+
+
+class KerasBatchGenerator():
+    def __init__(self, data, num_steps, batch_size, num_vocabulary, skip_step=5):
+        self.data = data
+        self.num_steps = num_steps
+        self.batch_size = batch_size
+        self.num_vocabulary = num_vocabulary
+        # this will track the progress of the batchs sequentially through the
+        # data set - once the data reachs the end of the data set will reset
+        # back to zero
+        self.current_idx = 0
+        # skip_step is the number of words wiich will be supplied before the next
+        # batch is skimmed from the data block
+        self.skip_step = skip_step
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        x = np.zeros((self.batch_size, self.num_steps))
+        y = np.zeros((self.batch_size, self.num_steps, self.num_vocabulary))
+
+        for index in range(self.batch_size):
+
+            if self.current_idx + self.num_steps >= len(self.data):
+                # reset the index back to the start of the data set
+                self.current_idx = 0
+
+            x[index, :] = self.data[self.current_idx:self.current_idx + self.num_steps]
+            tmp_y = self.data[self.current_idx + 1:self.current_idx + self.num_steps + 1]
+            # convert all of tmp_y into a one hot representation
+            y[index, :, :] = to_categorical(tmp_y, num_classes=self.num_vocabulary)
+
+            self.current_idx += self.skip_step
+
+        return x, y
