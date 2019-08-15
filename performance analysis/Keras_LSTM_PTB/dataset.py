@@ -6,12 +6,12 @@ import sklearn.preprocessing
 data_path = os.path.join(os.path.dirname(__file__), 'dataset')
 
 
-def _read_words(filename):
+def _read_words_(filename):
     with open(filename, 'r') as file:
         return file.read().replace('\n', '<eos>').split()
 
 
-def _check_ptb():
+def _check_ptb_():
     if not os.path.isdir(data_path):
         return False
     for file in ['ptb.train.txt', 'ptb.valid.txt', 'ptb.test.txt']:
@@ -21,8 +21,9 @@ def _check_ptb():
     return True
 
 
-def _download_ptb():
-    shutil.rmtree(data_path)
+def _download_ptb_():
+    if os.path.exists(data_path):
+        shutil.rmtree(data_path)
     os.mkdir(data_path)
 
     for file in ['ptb.train.txt', 'ptb.valid.txt', 'ptb.test.txt']:
@@ -33,8 +34,8 @@ def _download_ptb():
 
 def load_ptb():
     # if not local copy, download it
-    if not _check_ptb():
-        _download_ptb()
+    if not _check_ptb_():
+        _download_ptb_()
 
     # get the data paths
     train_path = os.path.join(data_path, 'ptb.train.txt')
@@ -42,9 +43,9 @@ def load_ptb():
     test_path = os.path.join(data_path, 'ptb.test.txt')
 
     # read files
-    train_data = _read_words(train_path)
-    valid_data = _read_words(valid_path)
-    test_data = _read_words(test_path)
+    train_data = _read_words_(train_path)
+    valid_data = _read_words_(valid_path)
+    test_data = _read_words_(test_path)
 
     # build the complete num_vocabulary
     labelEnc = sklearn.preprocessing.LabelEncoder()
