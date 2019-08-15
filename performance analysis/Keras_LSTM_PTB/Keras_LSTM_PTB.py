@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import numpy as np
-os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
 from keras.models import Sequential
 from keras.models import load_model
 from keras.layers import Dense
