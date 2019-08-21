@@ -10,19 +10,16 @@ def parse_argv(argv):
     parser = argparse.ArgumentParser()
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
 
-    # parser.add_argument('dataset', nargs='*', help='path of the datasets, can be a dir of list of files:\n ptb.train.txt ptb.valid.txt [ptb.test.txt]', default=[data_path])
-    # parser.add_argument('-t', '--train', help='trainning with datasets, can be a directory or 2 files (ptb.train.txt ptb.valid.txt)',
-    #                     metavar='dataset', nargs='*')
-    # parser.add_argument('-e', '--eval', help='test with trainned model, can be a directory or file name (ptb.test.txt)',
-    #                     metavar='dataset')
     parser.add_argument('-t', '--train', help='enable trainning', action='store_true')
     parser.add_argument('-e', '--eval', help='enable test', action='store_true')
     parser.add_argument('--step', help='step size', default=30, type=int,
                         metavar='num_steps', dest='num_steps')
     parser.add_argument('--batch', help='trainning batch size', default=20, type=int,
                         metavar='batch_size', dest='batch_size')
-    parser.add_argument('--embd', help='embedding vector size & LSTM hidden layer size', default=500,
-                        type=int, metavar='hidden_size', dest='embedding_size')
+    parser.add_argument('--embd', help='embedding vector size & first LSTM hidden layer size',
+                        type=int, metavar='embd_size', dest='embedding_size', default=500)
+    parser.add_argument('--lstm2', help='configure hidden size of second LSTM layer',
+                        type=int, metavar='hidden_size', dest='lstm_size', default=500)
     parser.add_argument('--cudnn', help='use CuDNN version of LSTM layer instead',
                         action='store_true')
 
@@ -37,33 +34,11 @@ def parse_argv(argv):
 
     args = parser.parse_args()
 
-    # if args.train is not None and len(args.train) == 1:
-    #     # path is a directory
-    #     if os.path.isdir(args.train[0]):
-    #         args.train = [
-    #             os.path.abspath(os.path.join(args.train[0], 'ptb.train.txt')),
-    #             os.path.abspath(os.path.join(args.train[0], 'ptb.valid.txt'))]
-    #         error_if_not_exist(args.train)
-    #     else:
-    #         raise IOError('need train/valid dataset, 2 text files')
-    #
-    # elif args.train is not None and len(args.train) == 2:
-    #     args.train = os.path.abspath(args.train)
-    #     error_if_not_exist(args.train)
-    #
-    # if args.eval is not None:
-    #     if os.path.isdir(args.eval):
-    #         # path is a directory
-    #         args.eval = os.path.join(args.eval, 'ptb.test.txt')
-    #
-    #     args.eval = os.path.abspath(args.eval)
-    #     error_if_not_exist(args.eval)
-
     if args.log_path is None:
-        args.log_path = '{}_{}_{}_{}.csv'.format(args.num_steps, args.batch_size, args.embedding_size, timestamp)
+        args.log_path = '{}_{}_{}_{}_{}.csv'.format(args.num_steps, args.batch_size, args.embedding_size, args.lstm_size, timestamp)
 
     if args.model_path is None:
-        args.model_path = '{}_{}_{}_{}.h5'.format(args.num_steps, args.batch_size, args.embedding_size, timestamp)
+        args.model_path = '{}_{}_{}_{}_{}.h5'.format(args.num_steps, args.batch_size, args.embedding_size, args.lstm_size, timestamp)
 
     args.log_path = os.path.abspath(args.log_path)
     args.model_path = os.path.abspath(args.model_path)

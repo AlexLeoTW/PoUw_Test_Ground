@@ -39,10 +39,10 @@ model = Sequential()
 model.add(Embedding(num_vocabulary, options.embedding_size, input_length=options.num_steps))
 if options.cudnn:
     model.add(CuDNNLSTM(options.embedding_size, return_sequences=True))
-    model.add(CuDNNLSTM(options.embedding_size, return_sequences=True))
+    model.add(CuDNNLSTM(options.lstm_size, return_sequences=True))
 else:
     model.add(LSTM(options.embedding_size, return_sequences=True))
-    model.add(LSTM(options.embedding_size, return_sequences=True))
+    model.add(LSTM(options.lstm_size, return_sequences=True))
 model.add(Dropout(0.25))
 model.add(TimeDistributed(Dense(num_vocabulary)))
 model.add(Activation('softmax'))
@@ -69,28 +69,23 @@ if options.train:
     print('custom_logger.train_time = {}'.format(custom_logger.train_time))
     print('custom_logger.result = {}'.format(custom_logger.result))
 
+    # write files
+    print('saving model "{}"...'.format(os.path.basename(options.model_path)))
+    save_result.save_model(options.model_path, model)
+
     # measure accuracy
     start_time = time.time()    # ---------------------------------------------┐
-    def valid_data_transform():
-        steps = len(valid_data) // (options.batch_size * options.num_steps)
-        x = np.zeros((steps, options.batch_size, options.num_steps))
-        y = np.zeros((steps, options.batch_size, options.num_steps, num_vocabulary))
-
-        for index in range(steps):
-            step_x, step_y = next(valid_data_generator)
-            x[index, :, :] = step_x
-            y[index, :, :, :] = step_y
-
-        return x, y
-
-    x_eval, y_eval = valid_data_transform()
-
     pred = model.predict_generator(valid_data_generator,
         steps=len(valid_data) // (options.batch_size * options.num_steps))
+    pred = np.argmax(pred, axis=2)
     val_time = time.time() - start_time   # -----------------------------------┘
 
-    acc_score = metrics.accuracy_score(y_eval, pred)
-    print('Accuracy =', acc_score*100)
+    steps = len(valid_data) // (options.batch_size * options.num_steps)
+    y_eval = valid_data[:steps * options.batch_size * options.num_steps]
+    pred = pred.flatten()
+
+    acc_score = metrics.accuracy_score(y_eval.flatten(), pred)
+    print('Accuracy = {}%'.format(acc_score * 100))
 
     # write files
     print('saving model "{}"...'.format(os.path.basename(options.model_path)))
@@ -140,6 +135,6 @@ if options.eval:
     actual_words, predicted_words = predict_with_data(test_data)
     actual_words = labelEnc.inverse_transform(actual_words)
     predicted_words = labelEnc.inverse_transform(predicted_words)
-    print("Training data:")
+    print("Test data:")
     print('  Actual words: ' + ' '.join(actual_words))
     print('  Predicted words: ' + ' '.join(predicted_words))
