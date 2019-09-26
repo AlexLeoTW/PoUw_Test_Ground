@@ -2,7 +2,7 @@ import time
 import csv
 import keras
 
-metrics = ['val_loss', 'val_acc', 'loss', 'acc', 'start_time', 'end_time']
+metrics = ['val_loss', 'val_categorical_accuracy', 'loss', 'categorical_accuracy', 'start_time', 'end_time']
 
 
 class CustomLogger(keras.callbacks.Callback):

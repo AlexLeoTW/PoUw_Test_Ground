@@ -67,7 +67,6 @@ if options.train:
     print('custom_logger.train_begin = {}'.format(custom_logger.train_begin))
     print('custom_logger.train_end = {}'.format(custom_logger.train_end))
     print('custom_logger.train_time = {}'.format(custom_logger.train_time))
-    print('custom_logger.result = {}'.format(custom_logger.result))
 
     # write files
     print('saving model "{}"...'.format(os.path.basename(options.model_path)))
