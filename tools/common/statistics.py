@@ -3,6 +3,11 @@ import sys
 import pandas as pd
 
 
+# statistics.csv should be located in the same directory with per-train log
+def _remap_logpath(df, statistics_path):
+    df['log_path'] = df['log_path'].apply(lambda log_path: os.path.join(os.path.dirname(statistics_path), os.path.basename(log_path)))
+
+
 class Statistics(object):
 
     def __init__(self, path, params):
@@ -11,6 +16,7 @@ class Statistics(object):
         self.statistics = pd.read_csv(path)
         self.params_combination = self.statistics[self.params].drop_duplicates()
         self.temp = None
+        _remap_logpath(self.statistics, path)
 
     def select_by_values(self, criteria):
         selection = pd.Series([True] * self.statistics.shape[0])
