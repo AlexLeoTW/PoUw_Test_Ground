@@ -2,34 +2,15 @@ import os
 import sys
 import matplotlib.pyplot as plt
 from statistics import Statistics
+import acc_req_descend
 
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
-# statistics_path = 'statistics.csv'
 statistics_path = sys.argv[1]
-params = ['conv1_filters', 'conv1_kernel_size', 'conv2_filters', 'pool', 'dense']
-# params = sys.argv[2:]
-
-# accuracy requirement decending formulla
-def acc_requirement(x):
-    return (-0.00003) * x + 1
+params = sys.argv[2:]
 
 statistics = Statistics(statistics_path, params)
-
-# fix log_path
-statistics.statistics['log_path'] = statistics.statistics['log_path'].apply(lambda log_path: os.path.join(os.path.dirname(statistics_path), os.path.basename(log_path)))
-
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
-
-
-def find_first_hit(df, params):
-    df.insert(loc=len(params), column='pass', value=df['val_acc'] >= acc_requirement(df['end_time']))
-
-    first_hit = df[df['pass']]
-    first_hit = first_hit.drop_duplicates(subset=params)
-    return first_hit
-
-
-first_hits = find_first_hit(collected_avg, params)
+first_hits = acc_req_descend.find_first_hit(collected_avg, params)
 
 # =========== end setting up ===========
 

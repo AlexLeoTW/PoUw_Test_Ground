@@ -16,9 +16,6 @@ params = sys.argv[2:]
 statistics = Statistics(statistics_path, params)
 plt.figure(figsize=figsize)
 
-# fix log_path
-statistics.statistics['log_path'] = statistics.statistics['log_path'].apply(lambda log_path: os.path.join(os.path.dirname(statistics_path), os.path.basename(log_path)))
-
 # collect avg-ed data
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=True)
 

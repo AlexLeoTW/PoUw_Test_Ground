@@ -5,16 +5,11 @@ import matplotlib.pyplot as plt
 import functools
 from statistics import Statistics
 
-figsize = [15, 8]
-# statistics_path = 'statistics.csv'
-# params = ['conv1_filters', 'conv1_kernel_size', 'conv2_filters', 'pool', 'dense']
 statistics_path = sys.argv[1]
 params = sys.argv[2:]
+figsize = [15, 8]
 
 statistics = Statistics(statistics_path, params)
-
-# fix log_path
-statistics.statistics['log_path'] = statistics.statistics['log_path'].apply(lambda log_path: os.path.join(os.path.dirname(statistics_path), os.path.basename(log_path)))
 
 
 def draw_per_avg():
