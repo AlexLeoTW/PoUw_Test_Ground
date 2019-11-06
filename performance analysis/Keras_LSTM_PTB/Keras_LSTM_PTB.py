@@ -39,10 +39,10 @@ model = Sequential()
 model.add(Embedding(num_vocabulary, options.embedding_size, input_length=options.num_steps))
 if options.cudnn:
     model.add(CuDNNLSTM(options.embedding_size, return_sequences=True))
-    model.add(CuDNNLSTM(options.lstm_size, return_sequences=True))
+    model.add(CuDNNLSTM(options.lstm2_size, return_sequences=True))
 else:
     model.add(LSTM(options.embedding_size, return_sequences=True))
-    model.add(LSTM(options.lstm_size, return_sequences=True))
+    model.add(LSTM(options.lstm2_size, return_sequences=True))
 model.add(Dropout(0.25))
 model.add(TimeDistributed(Dense(num_vocabulary)))
 model.add(Activation('softmax'))
@@ -95,6 +95,7 @@ if options.train:
         'num_steps': options.num_steps,
         'batch_size': options.batch_size,
         'embedding_size': options.embedding_size,
+        'lstm2_size': options.lstm2_size,
         'acc_score(%)': acc_score,
         'preprocess_time': preprocess_time,
         'startup_time': startup_time,

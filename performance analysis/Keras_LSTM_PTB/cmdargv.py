@@ -19,7 +19,7 @@ def parse_argv(argv):
     parser.add_argument('--embd', help='embedding vector size & first LSTM hidden layer size',
                         type=int, metavar='embd_size', dest='embedding_size', default=500)
     parser.add_argument('--lstm2', help='configure hidden size of second LSTM layer',
-                        type=int, metavar='hidden_size', dest='lstm_size', default=500)
+                        type=int, metavar='hidden_size', dest='lstm2_size', default=500)
     parser.add_argument('--cudnn', help='use CuDNN version of LSTM layer instead',
                         action='store_true')
 
