@@ -27,10 +27,10 @@ function new_job_file() {
     for conv_kernel_size in $CONV_KERNEL_SIZE; do
       for conv_num in $CONV_NUM; do
         for pool_size in $POOL_SIZE; do
-          echo "$PYTHON_CMD Keras_CNN_CIFAR10.py -conv $conv_filters $conv_kernel_size -conv_num $conv_num -pool $pool_size" >> $JOB_FILE
+          echo "$PYTHON_CMD Keras_CNN_CIFAR10.py --allow_growth --aug -conv $conv_filters $conv_kernel_size -conv_num $conv_num -pool $pool_size" >> $JOB_FILE
           echo "sed --in-place '6,7d' \$BASENAME" >> $JOB_FILE
-          echo "$PYTHON_CMD Keras_CNN_CIFAR10.py -conv $conv_filters $conv_kernel_size -conv_num $conv_num -pool $pool_size" >> $JOB_FILE
-          echo "sed --in-place '6,7d' \$BASENAME --stack independent" >> $JOB_FILE
+          echo "$PYTHON_CMD Keras_CNN_CIFAR10.py --allow_growth --aug -conv $conv_filters $conv_kernel_size -conv_num $conv_num -pool $pool_size --stack independent" >> $JOB_FILE
+          echo "sed --in-place '6,7d' \$BASENAME" >> $JOB_FILE
         done
       done
     done
