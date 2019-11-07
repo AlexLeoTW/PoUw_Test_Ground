@@ -29,12 +29,15 @@ function new_job_file() {
         for pool_size in $POOL_SIZE; do
           for dense in $DENSE; do
             echo "$PYTHON_CMD Keras_CNN_MNIST.py -conv1 $conv1_filters $conv1_kernel_size -conv2 $conv2_filters -pool $pool_size -dense $dense" >> $JOB_FILE
-            echo "sed --in-place '7,8d' \$BASENAME" >> $JOB_FILE
+            echo "sed --in-place '6,7d' \$BASENAME" >> $JOB_FILE
           done
         done
       done
     done
   done
+
+  echo "" >> $JOB_FILE
+  echo "rm \$BASENAME" >> $JOB_FILE
 }
 
 if [[ ! -f $JOB_FILE ]]; then

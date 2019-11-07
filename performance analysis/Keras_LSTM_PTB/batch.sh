@@ -27,11 +27,14 @@ function new_job_file() {
       for embd_size in $EMBD_SIZE; do
         for lstm2_size in $LSTM2_SIZE; do
           echo "$PYTHON_CMD Keras_LSTM_PTB.py -t --step $num_steps --batch $batch_size --embd $embd_size --lstm2 $lstm2_size" >> $JOB_FILE
-          echo "sed --in-place '7,8d' \$BASENAME" >> $JOB_FILE
+          echo "sed --in-place '6,7d' \$BASENAME" >> $JOB_FILE
         done
       done
     done
   done
+
+  echo "" >> $JOB_FILE
+  echo "rm \$BASENAME" >> $JOB_FILE
 }
 
 if [[ ! -f $JOB_FILE ]]; then
