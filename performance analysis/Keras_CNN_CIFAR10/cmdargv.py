@@ -2,6 +2,9 @@ import os
 import sys
 import time
 import argparse
+import numpy as np
+
+CIFAR10_figsize = (32, 32)
 
 
 def error_and_exit(parser, msg):
@@ -43,6 +46,24 @@ def parse_argv(argv):
 
     if args.stack == '2_in_a_row' and args.conv_num % 2 != 0:
         error_and_exit(parser, 'conv_num must be multiples of 2 when stacking mode \"2_in_a_row\"')
+
+    try:
+        figsize = np.array(CIFAR10_figsize)
+
+        # 1st layer (idx == 0)
+        if args.stack == 'independent':
+            figsize = figsize // args.pool
+        # 2nd+ layer
+        for idx_layer in range(1, args.conv_num):
+            if args.stack == '2_in_a_row' and idx_layer % 2 == 0:
+                figsize = figsize - figsize % args.conv[1]
+            else:
+                figsize = figsize - figsize % args.conv[1]
+                figsize = figsize // args.pool
+        if figsize.sum() < figsize.size:
+            raise Exception('not realistic conv/pooling combination')
+    except Exception as e:
+        error_and_exit(parser, e)
 
     if args.log_path is None:
         args.log_path = '{aug}_{filters}_{kernel_size}_{conv_num}_{pool}_{stack}_{timestamp}.csv'.format(
