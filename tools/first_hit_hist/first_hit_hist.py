@@ -1,21 +1,20 @@
 import os
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 from scipy import stats
 from statistics import Statistics
+from auto_params import auto_params
 import acc_req_descend
 
-statistics_path = sys.argv[1]
-params = sys.argv[2:]
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
 figsize = [15, 8]
 n_bins = 20
 
-statistics = Statistics(statistics_path, params)
+options = auto_params()
+statistics = Statistics(options.path, options.params)
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
-first_hits = acc_req_descend.find_first_hit(collected_avg, params)
+first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
 
 
 def _get_perm_values(df, param):
@@ -41,7 +40,7 @@ def _draw_norm_dist(plt, xs):
                  path_effects=[path_effects.withStroke(linewidth=4, foreground='white')])
 
 
-for param in params:
+for param in options.params:
     parm_values = _get_perm_values(first_hits, param=param)
     first_hits_categorized = []
 
@@ -59,5 +58,5 @@ for param in params:
 
     # plt.show()
     # break
-    plt.savefig(os.path.join(os.path.dirname(statistics_path), 'first_hit_hist_{}.jpg'.format(param)))
+    plt.savefig(os.path.join(os.path.dirname(options.path), 'first_hit_hist_{}.jpg'.format(param)))
     plt.cla()

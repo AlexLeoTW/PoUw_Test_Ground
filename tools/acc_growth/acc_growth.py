@@ -1,15 +1,15 @@
 import os
-import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import functools
 from statistics import Statistics
+from auto_params import auto_params
 
-statistics_path = sys.argv[1]
-params = sys.argv[2:]
 figsize = [15, 8]
 
-statistics = Statistics(statistics_path, params)
+options = auto_params()
+statistics = Statistics(options.path, options.params)
+print('options =', options)
 
 
 def draw_per_avg():
@@ -35,32 +35,33 @@ def draw_per_avg():
 
         plt.xlabel("end_time(s)")
         plt.ylabel("val_acc(%)")
-        plt.legend(title='_'.join(params))
+        plt.legend(title='_'.join(options.params))
 
         # plt.show()
-        plt.savefig(os.path.join(os.path.dirname(statistics_path), '{}.jpg'.format(figname)))
+        plt.savefig(os.path.join(os.path.dirname(options.path), '{}.jpg'.format(figname)))
         plt.cla()
 
 
 def draw_per_param_avg():
     plt.figure(figsize=figsize)
-    collected = statistics.deep_collect(['val_acc', 'end_time'])
-    collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=True)
+    collected = statistics.deep_collect([options.acc, 'end_time'])
+    collected_avg = statistics.deep_collect([options.acc, 'end_time'], avg=True)
 
-    for param in params:
+    for param in options.params:
 
         plt.scatter(collected['end_time'].tolist(), collected['val_acc'].tolist(), c='#808080', alpha=0.5)
 
         for conv1_filters in collected_avg[param].drop_duplicates().values:
 
             selected = collected_avg[collected_avg[param] == conv1_filters]
-            plt.scatter(selected['end_time'], selected['val_acc'], label=str(conv1_filters))
+            plt.scatter(selected['end_time'], selected[options.acc], label=str(conv1_filters))
 
-        plt.xlabel("end_time(s)")
-        plt.ylabel("val_acc(%)")
+        plt.xlabel('end_time(s)')
+        plt.ylabel('{acc}(%)'.format(acc=options.acc))
         plt.legend(title=param)
-        plt.savefig(os.path.join(os.path.dirname(statistics_path), 'param_{}.jpg'.format(param)))
-        print('param = {}'.format(param))
+        image_path = os.path.join(os.path.dirname(options.path), 'acc_growth_{}.jpg'.format(param))
+        plt.savefig(image_path)
+        print('saving {}'.format(image_path))
         plt.cla()
 
 

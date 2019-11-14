@@ -1,16 +1,15 @@
 import os
-import sys
 import matplotlib.pyplot as plt
 from statistics import Statistics
+from auto_params import auto_params
 import acc_req_descend
 
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
-statistics_path = sys.argv[1]
-params = sys.argv[2:]
 
-statistics = Statistics(statistics_path, params)
+options = auto_params()
+statistics = Statistics(options.path, options.params)
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
-first_hits = acc_req_descend.find_first_hit(collected_avg, params)
+first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
 
 # =========== end setting up ===========
 
@@ -36,7 +35,7 @@ def autolabel(rects):
                     ha='center', va='bottom')
 
 
-for param in params:
+for param in options.params:
     print('param = {param}'.format(param=param))
 
     avgs = first_hit_avg(first_hits, param)
@@ -51,5 +50,5 @@ for param in params:
     plt.title('first hit avg')
     # plt.show()
     # break
-    plt.savefig(os.path.join(os.path.dirname(statistics_path), 'first_hit_avg_bar_{}.jpg'.format(param)))
+    plt.savefig(os.path.join(os.path.dirname(options.path), 'first_hit_avg_bar_{}.jpg'.format(param)))
     plt.cla()
