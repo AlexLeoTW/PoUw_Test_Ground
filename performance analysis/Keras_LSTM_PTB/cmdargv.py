@@ -35,10 +35,10 @@ def parse_argv(argv):
     args = parser.parse_args()
 
     if args.log_path is None:
-        args.log_path = '{}_{}_{}_{}_{}.csv'.format(args.num_steps, args.batch_size, args.embedding_size, args.lstm_size, timestamp)
+        args.log_path = '{}_{}_{}_{}_{}.csv'.format(args.num_steps, args.batch_size, args.embedding_size, args.lstm2_size, timestamp)
 
     if args.model_path is None:
-        args.model_path = '{}_{}_{}_{}_{}.h5'.format(args.num_steps, args.batch_size, args.embedding_size, args.lstm_size, timestamp)
+        args.model_path = '{}_{}_{}_{}_{}.h5'.format(args.num_steps, args.batch_size, args.embedding_size, args.lstm2_size, timestamp)
 
     args.log_path = os.path.abspath(args.log_path)
     args.model_path = os.path.abspath(args.model_path)
