@@ -14,7 +14,6 @@ import cmdargv
 from CustomLogger import CustomLogger
 import save_result
 
-max_features = 20000  # cut texts after this number of words (among top max_features most common words)
 maxlen = 80
 batch_size = 32
 num_epochs = 50
@@ -32,7 +31,7 @@ if options.allow_growth:
     k_backend.tensorflow_backend.set_session(tf.Session(config=config))
 
 start_time = time.time()    # -------------------------------------------------┐
-(x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=max_features)
+(x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=options.max_features)
 print(len(x_train), 'train sequences')
 print(len(x_test), 'test sequences')
 
@@ -47,7 +46,7 @@ K_RNN = K_RNN.__dict__[options.type]
 
 start_time = time.time()    # -------------------------------------------------┐
 model = Sequential()
-model.add(Embedding(input_dim=max_features, output_dim=options.embd_size))
+model.add(Embedding(input_dim=options.max_features, output_dim=options.embd_size))
 model.add(K_RNN(units=options.embd_size))
 model.add(Dense(1, activation='sigmoid'))
 
@@ -92,6 +91,7 @@ save_result.save_model(options.model_path, model)
 
 print('saving statistics "{}"...'.format(os.path.basename(options.statistics_path)))
 save_result.save_statistics(options.statistics_path, entries={
+    'max_features': options.max_features,
     'embd_size': options.embd_size,
     'type': options.type,
     'acc_score(%)': acc_score,
