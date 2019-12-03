@@ -25,12 +25,13 @@ def parse_argv(argv):
 
     parser.add_argument('-l', '--log', help='save detailed trainning log (.csv file)',
         metavar='path', dest='log_path')
-
     parser.add_argument('-m', '--model', help='save/load trainned moldel (.h5 file)',
         metavar='path', dest='model_path')
-
     parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
         metavar='path', dest='statistics_path', default='statistics.csv')
+
+    parser.add_argument('--allow_growth', help='whether to set allow_growth for TensorFlow',
+        action='store_true', default=False)
 
     args = parser.parse_args()
 

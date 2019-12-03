@@ -21,6 +21,9 @@ def parse_argv(argv):
     parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
         dest='statistics_path', metavar='path', default='statistics.csv')
 
+    parser.add_argument('--allow_growth', help='whether to set allow_growth for TensorFlow',
+            action='store_true', default=False)
+
     args = parser.parse_args()
 
     if args.log_path == None:

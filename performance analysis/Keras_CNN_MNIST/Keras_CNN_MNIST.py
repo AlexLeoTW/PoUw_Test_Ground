@@ -28,6 +28,14 @@ img_rows, img_cols = 28, 28
 options = cmdargv.parse_argv(sys.argv)
 print('options = {}'.format(options))
 
+# TensorFlow wizardry
+if options.allow_growth:
+    import tensorflow as tf
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    import keras.backend as k_backend
+    k_backend.tensorflow_backend.set_session(tf.Session(config=config))
+
 start_time = time.time()    # -------------------------------------------------┐
 # the data, split between train and test sets
 (x_train, y_train), (x_test, y_test) = mnist.load_data()

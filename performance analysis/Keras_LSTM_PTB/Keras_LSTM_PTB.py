@@ -22,6 +22,14 @@ from CustomLogger import CustomLogger
 num_epochs = 50
 options = cmdargv.parse_argv(sys.argv)
 
+# TensorFlow wizardry
+if options.allow_growth:
+    import tensorflow as tf
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    import keras.backend as k_backend
+    k_backend.tensorflow_backend.set_session(tf.Session(config=config))
+
 # preprocess
 start_time = time.time()    # -------------------------------------------------┐
 # load PTB dataset
