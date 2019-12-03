@@ -33,7 +33,7 @@ for param in options.params:
 
     # collect "first_hits_categorized" of shape(len(parm_value), round)
     for parm_value in parm_values:
-        df_by_parm = first_hits.query('{param} == {parm_values}'.format(param=param, parm_values=parm_value))
+        df_by_parm = first_hits[first_hits[param] == parm_value]
         end_times = df_by_parm.loc[:, 'end_time'].to_list()
         first_hits_categorized.append(end_times)
 
