@@ -35,10 +35,12 @@ def find_first_hit(df, params):
 
     # keep the "first" hit record, drop the others
     first_hit = df[df[col_name]]
-    first_hit = first_hit.drop_duplicates(subset=params)
+    first_hit = first_hit.drop_duplicates(subset=params, keep='first')
 
     # cacultate hitting time with acc of last epoch
-    delayed_hits = df.drop_duplicates(subset=params)
+    delayed_hits = df.copy()
+    delayed_hits = delayed_hits.sort_values(by='val_acc', ascending=False)  # descending
+    delayed_hits = delayed_hits.drop_duplicates(subset=params, keep='first')
     def update_val_acc(col):
         col['end_time'] = acc_requirement_reverse(col['val_acc'])
         return col
