@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 import argparse
 import numpy as np
@@ -8,7 +7,7 @@ from error import error_and_exit
 CIFAR10_figsize = (32, 32)
 
 
-def parse_argv(argv):
+def parse_argv():
     parser = argparse.ArgumentParser()
     timestamp = time.strftime("%Y-%m-%d_%H:%M:%S", time.gmtime())
 
@@ -83,10 +82,11 @@ def parse_argv(argv):
     return args
 
 
-def main(argv):
-    options = parse_argv(argv)
-    print(options)
+def main():
+    options = parse_argv()
+    for key in options.__dict__:
+        print('{}: {}'.format(key, options.__dict__[key]))
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()

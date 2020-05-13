@@ -6,7 +6,7 @@ import time
 data_path = os.path.join(os.path.dirname(__file__), 'dataset')
 
 
-def parse_argv(argv):
+def parse_argv():
     parser = argparse.ArgumentParser()
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
 
@@ -50,7 +50,6 @@ def parse_argv(argv):
 
 def main(argv):
     options = parse_argv(argv)
-
     for key in options.__dict__:
         print('{}: {}'.format(key, options.__dict__[key]))
 
