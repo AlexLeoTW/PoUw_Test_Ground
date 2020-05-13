@@ -48,15 +48,6 @@ def parse_argv(argv):
     return args
 
 
-def error_if_not_exist(paths):
-    if not isinstance(paths, list):
-        paths = [paths]
-
-    for path in paths:
-        if not os.path.exists(path):
-            raise IOError(path)
-
-
 def main(argv):
     options = parse_argv(argv)
 

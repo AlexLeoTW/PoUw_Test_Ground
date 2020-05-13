@@ -3,14 +3,9 @@ import sys
 import time
 import argparse
 import numpy as np
+from error import error_and_exit
 
 CIFAR10_figsize = (32, 32)
-
-
-def error_and_exit(parser, msg):
-    parser.print_usage()
-    print('{prog}: error: {msg}'.format(prog=sys.argv[0], msg=msg))
-    sys.exit(1)
 
 
 def parse_argv(argv):

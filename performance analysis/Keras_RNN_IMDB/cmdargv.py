@@ -4,12 +4,6 @@ import time
 import argparse
 
 
-def error_and_exit(parser, msg):
-    parser.print_usage()
-    print('{prog}: error: {msg}'.format(prog=sys.argv[0], msg=msg))
-    sys.exit(1)
-
-
 def parse_argv(argv):
     parser = argparse.ArgumentParser()
     timestamp = time.strftime("%Y-%m-%d_%H:%M:%S", time.gmtime())
