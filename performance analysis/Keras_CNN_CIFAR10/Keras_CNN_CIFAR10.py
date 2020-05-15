@@ -10,7 +10,6 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 import os
-import sys
 import math
 import time
 import numpy as np
@@ -25,7 +24,7 @@ epochs = 100
 num_predictions = 20
 
 # read commandline arguments
-options = cmdargv.parse_argv(sys.argv)
+options = cmdargv.parse_argv()
 print('options = {}'.format(options))
 
 # TensorFlow wizardry

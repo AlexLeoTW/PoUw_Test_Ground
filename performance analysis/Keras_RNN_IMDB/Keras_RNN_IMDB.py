@@ -6,7 +6,6 @@ from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import Dense, Embedding
 from keras.datasets import imdb
-import sys
 import time
 import os
 from sklearn import metrics
@@ -19,7 +18,7 @@ batch_size = 32
 num_epochs = 50
 
 # read commandline arguments
-options = cmdargv.parse_argv(sys.argv)
+options = cmdargv.parse_argv()
 print('options = {}'.format(options))
 
 # TensorFlow wizardry

@@ -4,7 +4,6 @@ https://github.com/keras-team/keras/blob/master/examples/mnist_cnn.py
 '''
 
 import os
-import sys
 import time
 import numpy as np
 import keras
@@ -26,7 +25,7 @@ epochs = 12
 img_rows, img_cols = 28, 28
 
 # read commandline arguments
-options = cmdargv.parse_argv(sys.argv)
+options = cmdargv.parse_argv()
 print('options = {}'.format(options))
 
 # TensorFlow wizardry

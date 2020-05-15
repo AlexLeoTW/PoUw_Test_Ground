@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 import numpy as np
 from keras.models import Sequential
@@ -20,7 +19,7 @@ from CustomLogger import CustomLogger
 
 # options
 num_epochs = 50
-options = cmdargv.parse_argv(sys.argv)
+options = cmdargv.parse_argv()
 
 # TensorFlow wizardry
 if options.allow_growth:
