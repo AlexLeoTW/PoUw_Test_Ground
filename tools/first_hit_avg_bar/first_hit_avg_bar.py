@@ -1,12 +1,12 @@
 import os
 import matplotlib.pyplot as plt
 from statistics import Statistics
-from auto_params import auto_params
+from auto_params import parse_argv
 import acc_req_descend
 
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
 
-options = auto_params()
+options = parse_argv()
 statistics = Statistics(options.path, options.params)
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
 first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
@@ -48,7 +48,5 @@ for param in options.params:
     plt.xlabel(param)
     plt.ylabel("end_time(s)")
     plt.title('first hit avg')
-    # plt.show()
-    # break
-    plt.savefig(os.path.join(os.path.dirname(options.path), 'first_hit_avg_bar_{}.jpg'.format(param)))
+    plt.savefig(os.path.join(os.path.dirname(options.path), f'first_hit_avg_bar_{param}.jpg'))
     plt.cla()

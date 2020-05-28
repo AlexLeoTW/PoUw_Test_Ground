@@ -1,14 +1,14 @@
 import os
 import matplotlib.pyplot as plt
 from statistics import Statistics
-from auto_params import auto_params
+from auto_params import parse_argv
 import acc_req_descend
 
 colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
 figsize = None
 n_bins = 20
 
-options = auto_params()
+options = parse_argv()
 statistics = Statistics(options.path, options.params)
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
 first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
@@ -39,5 +39,5 @@ for param in options.params:
 
     _draw_cdf(first_hits_categorized, n_bins)
 
-    plt.savefig(os.path.join(os.path.dirname(options.path), 'first_hit_cdf_{}.jpg'.format(param)))
+    plt.savefig(os.path.join(os.path.dirname(options.path), f'first_hit_cdf_{param}.jpg'))
     plt.cla()

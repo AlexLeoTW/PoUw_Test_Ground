@@ -1,14 +1,14 @@
 import os
 import matplotlib.pyplot as plt
 from statistics import Statistics
-from auto_params import auto_params
+from auto_params import parse_argv
 import acc_req_descend
 
 highlighted_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
 dimmed_colors = ['#3B5F77', '#AF7C4E', '#467546', '#803A3A', '#776587', '#67514D']
 figsize = [30, 16]
 
-options = auto_params()
+options = parse_argv()
 statistics = Statistics(options.path, options.params)
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
 first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
