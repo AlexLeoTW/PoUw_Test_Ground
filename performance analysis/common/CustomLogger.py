@@ -43,10 +43,10 @@ class CustomLogger(keras.callbacks.Callback):
         self.train_begin = time.time()
 
     def on_epoch_begin(self, batch, logs={}):
-        self.epoch_time_start = time.time()
+        self.epoch_time_start = time.time() - self.train_begin
 
     def on_epoch_end(self, batch, logs={}):
-        self.epoch_time_end = time.time()
+        self.epoch_time_end = time.time() - self.train_begin
 
         logs['start_time'] = self.epoch_time_start
         logs['end_time'] = self.epoch_time_end
