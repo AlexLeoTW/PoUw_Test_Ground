@@ -6,14 +6,14 @@ import acc_req_descend
 
 highlighted_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
 dimmed_colors = ['#3B5F77', '#AF7C4E', '#467546', '#803A3A', '#776587', '#67514D']
-figsize = [30, 16]
 
 options = parse_argv()
 statistics = Statistics(options.path, options.params)
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
 first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
 
-plt.figure(figsize=figsize)
+x_lim, y_lim = acc_req_descend.x_y_lim(first_hits, expand=True, margin=0.1, fit_curve=True)
+plt.figure()
 
 for param in options.params:
     print('param = {param}'.format(param=param))
@@ -35,6 +35,8 @@ for param in options.params:
 
     plt.xlabel("end_time(s)")
     plt.ylabel("val_acc(%)")
+    plt.xlim(x_lim)
+    plt.ylim(y_lim)
     plt.legend(title=param)
     plt.savefig(os.path.join(os.path.dirname(options.path), 'first_hit_{}.jpg'.format(param)))
     plt.cla()
