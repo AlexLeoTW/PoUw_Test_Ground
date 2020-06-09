@@ -8,7 +8,7 @@ highlighted_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8
 dimmed_colors = ['#3B5F77', '#AF7C4E', '#467546', '#803A3A', '#776587', '#67514D']
 
 options = parse_argv()
-statistics = Statistics(options.path, options.params)
+statistics = Statistics(options.path, options.params, normalize_colname=True)
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
 first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
 

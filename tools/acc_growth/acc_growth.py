@@ -8,7 +8,7 @@ from auto_params import auto_params
 figsize = [15, 8]
 
 options = auto_params()
-statistics = Statistics(options.path, options.params)
+statistics = Statistics(options.path, options.params, normalize_colname=True)
 print('options =', options)
 
 

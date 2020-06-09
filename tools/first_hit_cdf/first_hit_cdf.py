@@ -9,7 +9,7 @@ figsize = None
 n_bins = 20
 
 options = parse_argv()
-statistics = Statistics(options.path, options.params)
+statistics = Statistics(options.path, options.params, normalize_colname=True)
 collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
 first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
 
