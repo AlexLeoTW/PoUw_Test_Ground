@@ -21,10 +21,9 @@ def _get_perm_values(df, param):
     return (df.loc[:, param]).drop_duplicates().values
 
 
-def _draw_hist(plt, xs, n_bins):
+def _draw_hist(plt, xs):
     plt.hist(first_hits_categorized, bins=n_bins, density=True, label=parm_values,
              color=colors[:len(parm_values)])
-    plt.legend(title=param)
 
 
 def _draw_norm_dist(plt, xs):
@@ -32,7 +31,7 @@ def _draw_norm_dist(plt, xs):
     xmin, xmax = min(xticks), max(xticks)
 
     for index, hits in enumerate(xs):
-        xticks = np.linspace(xmin, xmax, len(hits))
+        xticks = np.linspace(xmin, xmax, max(len(hits), n_bins))
         mean, stddiv = stats.norm.fit(hits)
         pdf_g = stats.norm.pdf(xticks, mean, stddiv)
         plt.plot(xticks, pdf_g,
@@ -46,15 +45,16 @@ for param in options.params:
 
     print(f'{param}: {parm_values}')
 
-    # collect "first_hits_categorized" of shape(round, len(parm_value))
+    # collect "first_hits_categorized" of shape(len(parm_value), test_rounds)
     for parm_value in parm_values:
         df_by_parm = first_hits[first_hits[param] == parm_value]
         end_times = df_by_parm.loc[:, 'end_time'].to_list()
         first_hits_categorized.append(end_times)
 
     plt.figure(figsize=figsize)
-    _draw_hist(plt, first_hits_categorized, n_bins)
+    _draw_hist(plt, first_hits_categorized)
     _draw_norm_dist(plt, first_hits_categorized)
+    plt.legend(title=param)
 
     plt.savefig(os.path.join(os.path.dirname(options.path), f'first_hit_hist_{param}.jpg'))
     plt.cla()
