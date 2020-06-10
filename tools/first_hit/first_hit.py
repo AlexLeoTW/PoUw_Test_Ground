@@ -19,6 +19,8 @@ for param in options.params:
     print('param = {param}'.format(param=param))
     highlighted_colors_iter = iter(highlighted_colors)
     dimmed_colors_iter = iter(dimmed_colors)
+    plt.xlim(x_lim)
+    plt.ylim(y_lim)
 
     for param_value in collected_avg[param].drop_duplicates().values:
 
@@ -35,8 +37,6 @@ for param in options.params:
 
     plt.xlabel("end_time(s)")
     plt.ylabel("val_acc(%)")
-    plt.xlim(x_lim)
-    plt.ylim(y_lim)
     plt.legend(title=param)
     plt.savefig(os.path.join(os.path.dirname(options.path), 'first_hit_{}.jpg'.format(param)))
     plt.cla()

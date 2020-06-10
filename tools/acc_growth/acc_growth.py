@@ -3,11 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import functools
 from statistics import Statistics
-from auto_params import auto_params
+from auto_params import parse_argv
 
 figsize = [15, 8]
 
-options = auto_params()
+options = parse_argv()
 statistics = Statistics(options.path, options.params, normalize_colname=True)
 print('options =', options)
 
