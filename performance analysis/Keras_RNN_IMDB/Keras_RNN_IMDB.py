@@ -2,10 +2,12 @@
 https://github.com/keras-team/keras/blob/master/examples/imdb_lstm.py
 '''
 
+import keras
 from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import Dense, Embedding
 from keras.datasets import imdb
+from packaging import version
 import time
 import os
 from sklearn import metrics
@@ -29,6 +31,14 @@ if options.allow_growth:
     import keras.backend as k_backend
     k_backend.tensorflow_backend.set_session(tf.Session(config=config))
 
+# load whhatever options.type says (checked in cmdargv)
+if options.type.startswith('CuDNN') and keras.backend.backend() == 'tensorflow':
+    if version.parse(__import__('tensorflow').__version__) > version.parse('2.0'):
+        K_RNN = __import__('tensorflow.compat.v1.keras.layers', fromlist=[options.type])
+else:
+    K_RNN = __import__('keras.layers', fromlist=[options.type])
+K_RNN = K_RNN.__dict__[options.type]
+
 start_time = time.time()    # -------------------------------------------------┐
 (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=options.max_features)
 print(len(x_train), 'train sequences')
@@ -38,10 +48,6 @@ x_train = sequence.pad_sequences(x_train, maxlen=maxlen)
 x_test = sequence.pad_sequences(x_test, maxlen=maxlen)
 
 preprocess_time = time.time() - start_time   # --------------------------------┘
-
-# load whhatever options.type says (checked in cmdargv)
-K_RNN = __import__('keras.layers', fromlist=[options.type])
-K_RNN = K_RNN.__dict__[options.type]
 
 start_time = time.time()    # -------------------------------------------------┐
 model = Sequential()
