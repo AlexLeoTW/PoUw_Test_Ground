@@ -30,6 +30,12 @@ def select_by_values(df, criteria):
     return df[selection]
 
 
+def avg_statistics(path, params):
+    df = pd.read_csv(path)
+    df = df.groupby(params).mean().reset_index()
+    return df
+
+
 def _group_by_params(df, params, sorted=False):
     local_df = df if sorted else df.sort_values(by=params)
 
