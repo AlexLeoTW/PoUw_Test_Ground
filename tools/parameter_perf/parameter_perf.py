@@ -1,150 +1,186 @@
 import numpy as np
 from auto_params import parse_argv
-from statistics import avg_statistics, select_by_values
-from collections import Iterable
+from statistics import avg_statistics
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
 import os
-
-targets = ['acc_score(%)', 'train_time']
 
 
 def _main():
     options = parse_argv()
     avg = avg_statistics(options.path, options.params)
+    plot_config = read_config()
 
-    for param in options.params:
-        print(f'param = {param}')
+    targets = [plot['col_name'] for plot in plot_config]
+    values = _collect_values(avg, options.params, targets)
+    labels = _collect_labels(avg, options.params)
 
-        p_values = avg[param].drop_duplicates().to_list()
-        labels = [str(value) for value in p_values]
-        print(f'labels = {labels}')
+    for param in values:
+        print(f'drawing fig "pref_{param}.jpg"')
 
-        values = _collect_values(avg, param, p_values, targets)
-
-        fig = _draw_plot(labels, values, annotate=True, scale=True)
-        fig.tight_layout()
+        fig = _draw_plot(values[param], plot_config, labels[param], title=param)
+        fig.subplots_adjust(bottom=0.2)
         fig.savefig(
             os.path.join(os.path.dirname(options.path), f'pref_{param}.jpg'))
-        plt.cla()
+        plt.close('all')
 
 
-def _draw_plot_vertical(labels, values, annotate=False, scale=False):
-    assert len(labels) == len(values)
-
-    values = np.array(values)
-
-    len_group = values.shape[1]
-    num_categories = len(labels)
-    bar_width = 1.0 / (num_categories + 1)
-
-    fig, ax = plt.subplots(figsize=(2 * len_group, 5))
-    x_base = np.arange(len_group)
-    bottom = values.min() - (values.max() - values.min()) * 0.1
-    bottom = np.floor(bottom * 1000.0) / 1000.0
-
-    for index, value, label in zip(range(num_categories), values, labels):
-        x_start = bar_width * index + bar_width
-        xs = x_base + x_start
-
-        if scale:
-            rects = ax.bar(xs, value-bottom, width=bar_width, label=label)
-            ax.yaxis.set_major_formatter(FuncFormatter(
-                lambda x, pos: x + bottom))
-        else:
-            rects = ax.bar(xs, value, width=bar_width, label=label)
-
-        if annotate:
-            autolabel(rects, ax)
-
-    ax.set_xticks([])   # hide x_ticks
-    ax.legend()
-
-    return fig
-
-
-def _collect_values(df, param, p_values, targets):
+def _collect_values(avg, params, targets):
     values = {
-        # 'acc_score(%)': [[], [], [], ...],
-        # 'train_time': [[], [], [], ...],
-        # ...
+        # 'conv1_filters': {
+        #     'acc_score(%)': {16: [], 32: [], 64: []},
+        #     'train_time': {16: [], 32: [], 64: []},
+        #     ...
+        # },
+        # 'conv1_kernel_size': {
+        #     'acc_score(%)': {2: [], 3: [], 4: []},
+        #     'train_time': {2: [], 3: [], 4: []},
+        #     ...
+        # }
     }
 
-    for p_value in p_values:
-        this_value = select_by_values(df, {param: p_value})
-        _append_values(values, this_value, targets)
+    # init values
+    for param in params:
+        values[param] = {}
+        for target in targets:
+            values[param][target] = {}
+
+    for param in params:
+        param_avg = avg.set_index(param)
+        param_avg = param_avg[targets]
+        p_values = list(set(param_avg.index.sort_values()))
+
+        for p_value in p_values:
+            temp = param_avg.loc[p_value].reset_index(drop=True).to_dict(orient='list')
+
+            for tnl in targets:
+                values[param][tnl][p_value] = temp[tnl]
 
     return values
 
 
-def _append_values(values, df, targets):
-    for target in targets:
-        target_value = df[target].to_list()
+def _collect_labels(avg, params):
+    labels = {
+        # 'conv1_filters': [...],
+        # 'conv1_kernel_size': [...]
+    }
 
-        if target in values:
-            values[target].append(target_value)
-        else:
-            values[target] = [target_value]
+    def _labeler(row):
+        out = ''
+        for key, value in row[params_list].items():
+            out += f'{key}_{int(value)}\n'
+
+        return out
+
+    for param in params:
+        hide_param = param
+        params_list = params.copy()
+        params_list.remove(hide_param)
+        labels[param] = avg[params_list].drop_duplicates().apply(_labeler, axis=1)
+
+    return labels
 
 
-def _draw_plot(labels, values, annotate=False, scale=False):
-    max_len_group = max([len(values[x][0]) for x in values])
-    len_target = len(values.keys())
-    print(f'max_len_group = {max_len_group}')
-    print(f'figsize = {(2 * max_len_group, 5 * len_target)}')
-    fig, axs = plt.subplots(len(values), 1,
-                            figsize=(2 * max_len_group, 5 * len_target))
-    fig.tight_layout()
+def _draw_plot(values, plot_config, labels=[], title=None):
+    num_targets = len(values)
+    num_group = max(map(    # dual-loop, find longest list
+        lambda k1: max(map(
+            lambda k2: len(values[k1][k2]), values[k1]))
+        , values))
+    figsize = (2 * num_group, 5 * num_targets)
 
-    for ax, target in zip(axs, values):
-        _draw_subplot(ax, labels, values[target], annotate, scale)
+    fig, axes = plt.subplots(nrows=num_targets, ncols=1, figsize=figsize)
+    if num_targets == 1:
+        axes = [axes]
+
+    for ax, target, config in zip(axes, values, plot_config):
+        _draw_subplot(ax, values[target], labels, annotate=config['annotate'], scale=config['scale'])
+        ax.set(ylabel=target)
+        ax.set_xticks([])
+
+    ax.set_xticks(range(num_group))
+    ax.set_xticklabels(labels)
+    plt.setp(ax.get_xticklabels(), rotation=90, ha="right",
+         rotation_mode="anchor")
+
+    if title:
+        fig.suptitle(title)
 
     return fig
 
 
-def _draw_subplot(ax, labels, values, annotate=False, scale=False):
-    assert len(labels) == len(values)
-
-    values = np.array(values)
-
-    len_group = values.shape[1]
-    num_categories = len(labels)
+def _draw_subplot(ax, values, labels=[], annotate=False, scale=False):
+    # values = { 16: [...], 32: [...], 64: [...] }
+    num_categories = len(values.keys())
+    num_bar_group = max([len(values[key]) for key in values])
     bar_width = 1.0 / (num_categories + 1)
-    x_base = np.arange(len_group)
+    x_loc_iter = _x_loc_iter(bar_width, num_categories, num_bar_group)
 
-    bottom = values.min() - (values.max() - values.min()) * 0.1
-    bottom = np.floor(bottom * 1000.0) / 1000.0
-
-    for index, value, label in zip(range(num_categories), values, labels):
-        x_start = bar_width * index + bar_width
-        xs = x_base + x_start
-
-        if scale:
-            rects = ax.bar(xs, value-bottom, width=bar_width, label=label)
-            ax.yaxis.set_major_formatter(FuncFormatter(
-                lambda x, pos: np.around(x + bottom, decimals=3)))
-        else:
-            rects = ax.bar(xs, value, width=bar_width, label=label)
+    for label, value in values.items():
+        rects = ax.bar(next(x_loc_iter), value, width=bar_width, label=label)
 
         if annotate:
-            _draw_annotate(rects, ax, value)
+            _draw_annotate(rects, ax, value, annotate)
 
-    ax.set_xticks([])   # hide x_ticks
-    ax.legend()
+    # ax.set_xticks(range(num_bar_group))
+    # ax.set_xticklabels(labels)
+    # plt.setp(ax.get_xticklabels(), rotation=90, ha="right",
+    #      rotation_mode="anchor")
+
+    ax.set_xlim(-0.5, num_bar_group)
+    if scale:
+        ax.set_ylim(*_ylim(values))
 
 
-def _draw_annotate(rects, ax, value):
-    for rect, val in zip(rects, value):
+def _draw_annotate(rects, ax, value, annotate='{.2f}'):
+    for rect in rects:
         height = rect.get_height()
-        ax.annotate(f'{val:.3f}',  # f'{val:.3%}',
+        ax.annotate(annotate.format(height),
                     xy=(rect.get_x() + rect.get_width() / 2, height),
                     xytext=(0, 3),  # 3 points vertical offset
                     textcoords="offset points",
                     ha='center', va='bottom', annotation_clip=True)
 
 
-def iterable(obj):
-    return isinstance(obj, Iterable)
+def _ylim(values):
+    values = list(map(lambda key: values[key], values))
+    values = np.array(values)
+    v_min = values.min()
+    v_max = values.max()
+    range = v_max - v_min
+
+    x_min = max((v_min - range * 0.1), 0)
+    x_max = v_max + range * 0.1
+
+    return (x_min, x_max)
+
+
+def _x_loc_iter(bar_width, num_categories, num_bar_group):
+    x_loc_base = np.arange(num_bar_group)
+
+    for idx_bar in range(num_categories):
+        yield x_loc_base + (idx_bar * bar_width)
+
+
+def read_config():
+    from conf import plots
+
+    for plot in plots:
+        # ============================== col_name ==============================
+        assert 'col_name' in plot, 'must specify "col_name"'
+
+        # ============================= omit_syle ==============================
+        if 'title' not in plot or plot['title'] is None:
+            plot['title'] = plot['col_name']
+
+        # ============================== annotate ==============================
+        if 'scale' not in plot:
+            plot['omit_syle'] = False
+
+        # =============================== title ================================
+        if 'annotate' not in plot:
+            plot['annotate'] = None
+
+    return plots
 
 
 if __name__ == '__main__':
