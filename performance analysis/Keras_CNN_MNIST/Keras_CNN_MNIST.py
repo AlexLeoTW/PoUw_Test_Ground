@@ -27,7 +27,6 @@ img_rows, img_cols = 28, 28
 
 # read commandline arguments
 options = cmdargv.parse_argv()
-print('options = {}'.format(options))
 
 # TensorFlow wizardry
 if options.allow_growth:

@@ -20,7 +20,6 @@ num_epochs = 50
 
 # read commandline arguments
 options = cmdargv.parse_argv()
-print('options = {}'.format(options))
 
 # TensorFlow wizardry
 if options.allow_growth:
@@ -70,11 +69,6 @@ print('Test accuracy:', acc)
 start_time = time.time()    # -------------------------------------------------┐
 pred = model.predict(x_test)
 val_time = time.time() - start_time   # ---------------------------------------┘
-
-pred = pred.reshape(len(pred))
-pred = (pred > 0.5).astype('int')
-print(pred[:10])
-print(y_test[:10])
 
 acc_score = metrics.accuracy_score(y_test, pred)
 print('Accuracy =', acc_score*100)

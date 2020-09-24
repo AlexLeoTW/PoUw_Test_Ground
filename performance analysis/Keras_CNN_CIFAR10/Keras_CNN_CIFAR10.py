@@ -26,7 +26,6 @@ num_predictions = 20
 
 # read commandline arguments
 options = cmdargv.parse_argv()
-print('options = {}'.format(options))
 
 # TensorFlow wizardry
 if options.allow_growth:
@@ -104,7 +103,7 @@ if not options.aug:
     train_time = time.time() - start_time   # ---------------------------------┘
 else:
     start_time = time.time()    # ---------------------------------------------┐
-    print('Using real-time data augmentation.')
+    print('Using random data augmentation.')
     datagen = ImageDataGenerator(
         rotation_range=20,
         width_shift_range=0.1,
