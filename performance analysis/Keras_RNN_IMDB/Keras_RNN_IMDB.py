@@ -2,18 +2,17 @@
 https://github.com/keras-team/keras/blob/master/examples/imdb_lstm.py
 '''
 
-import keras
 from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import Dense, Embedding
 from keras.datasets import imdb
-from packaging import version
 import time
 import os
 from sklearn import metrics
 import cmdargv
 from CustomLogger import CustomLogger
 import save_result
+import tf_tricks
 
 maxlen = 80
 batch_size = 32
@@ -25,19 +24,9 @@ print('options = {}'.format(options))
 
 # TensorFlow wizardry
 if options.allow_growth:
-    import tensorflow as tf
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    import keras.backend as k_backend
-    k_backend.tensorflow_backend.set_session(tf.Session(config=config))
+    tf_tricks.allow_growth()
 
-# load whhatever options.type says (checked in cmdargv)
-if options.type.startswith('CuDNN') and keras.backend.backend() == 'tensorflow':
-    if version.parse(__import__('tensorflow').__version__) > version.parse('2.0'):
-        K_RNN = __import__('tensorflow.compat.v1.keras.layers', fromlist=[options.type])
-else:
-    K_RNN = __import__('keras.layers', fromlist=[options.type])
-K_RNN = K_RNN.__dict__[options.type]
+K_RNN = tf_tricks.import_layer(options.type)
 
 start_time = time.time()    # -------------------------------------------------┐
 (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=options.max_features)

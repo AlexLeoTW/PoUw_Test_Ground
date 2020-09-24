@@ -5,8 +5,6 @@ from keras.models import Sequential
 from keras.models import load_model
 from keras.layers import Dense
 from keras.layers import Embedding
-from keras.layers import LSTM
-from keras.layers import CuDNNLSTM
 from keras.layers import Dropout
 from keras.layers import TimeDistributed
 from keras.layers import Activation
@@ -16,6 +14,7 @@ import save_result
 import dataset
 from KerasBatchGenerator import KerasBatchGenerator
 from CustomLogger import CustomLogger
+import tf_tricks
 
 # options
 num_epochs = 50
@@ -23,11 +22,7 @@ options = cmdargv.parse_argv()
 
 # TensorFlow wizardry
 if options.allow_growth:
-    import tensorflow as tf
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    import keras.backend as k_backend
-    k_backend.tensorflow_backend.set_session(tf.Session(config=config))
+    tf_tricks.allow_growth()
 
 # preprocess
 start_time = time.time()    # -------------------------------------------------┐
@@ -42,14 +37,15 @@ valid_data_generator = KerasBatchGenerator(valid_data, options.num_steps, option
 preprocess_time = time.time() - start_time   # --------------------------------┘
 
 start_time = time.time()    # -------------------------------------------------┐
+if options.cudnn:
+    USER_LSTM = tf_tricks.import_layer('CuDNNLSTM')
+else:
+    USER_LSTM = tf_tricks.import_layer('LSTM')
+
 model = Sequential()
 model.add(Embedding(num_vocabulary, options.embedding_size, input_length=options.num_steps))
-if options.cudnn:
-    model.add(CuDNNLSTM(options.embedding_size, return_sequences=True))
-    model.add(CuDNNLSTM(options.lstm2_size, return_sequences=True))
-else:
-    model.add(LSTM(options.embedding_size, return_sequences=True))
-    model.add(LSTM(options.lstm2_size, return_sequences=True))
+model.add(USER_LSTM(options.embedding_size, return_sequences=True))
+model.add(USER_LSTM(options.lstm2_size, return_sequences=True))
 model.add(Dropout(0.25))
 model.add(TimeDistributed(Dense(num_vocabulary)))
 model.add(Activation('softmax'))

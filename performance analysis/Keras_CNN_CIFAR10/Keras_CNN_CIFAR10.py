@@ -17,6 +17,7 @@ from sklearn import metrics
 import cmdargv
 import save_result
 from CustomLogger import CustomLogger
+import tf_tricks
 
 batch_size = 32
 num_classes = 10
@@ -29,11 +30,7 @@ print('options = {}'.format(options))
 
 # TensorFlow wizardry
 if options.allow_growth:
-    import tensorflow as tf
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    import keras.backend as k_backend
-    k_backend.tensorflow_backend.set_session(tf.Session(config=config))
+    tf_tricks.allow_growth()
 
 start_time = time.time()    # -------------------------------------------------┐
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()

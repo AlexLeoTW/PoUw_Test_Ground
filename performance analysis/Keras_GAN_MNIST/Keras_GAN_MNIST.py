@@ -9,18 +9,13 @@ import numpy as np
 import time
 import os
 import save_result
+import tf_tricks
 import cmdargv
 from GAN import GAN
 from SaveFig import SaveFig
 
 # Tensorflow GPU Trick
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-    try:
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-    except RuntimeError as e:
-        print(e)
+tf_tricks.allow_growth()
 
 # pre-defined consstants
 BUFFER_SIZE = 60000
