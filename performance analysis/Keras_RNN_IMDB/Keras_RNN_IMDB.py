@@ -66,11 +66,12 @@ score, acc = model.evaluate(x_test, y_test)
 print('Test score:', score)
 print('Test accuracy:', acc)
 
+print('\nEvaluation:')
 start_time = time.time()    # -------------------------------------------------┐
 pred = model.predict(x_test)
 val_time = time.time() - start_time   # ---------------------------------------┘
 
-acc_score = metrics.accuracy_score(y_test, pred)
+acc_score = metrics.accuracy_score(y_test, pred > 0.5)
 print('Accuracy =', acc_score*100)
 
 # write files
