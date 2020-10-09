@@ -65,16 +65,16 @@ def auto_acc_loss_from_file(path, is_statistics=True):
         return auto_acc_loss(colnames)
 
 
-def parse_argv(auto_params=True):
+def parse_argv(args=None, auto_params=True):
     parser = argparse.ArgumentParser()
 
     parser.add_argument('path', help='where statistics.csv is stored')
     parser.add_argument('-params', help='which columns are params(variables) in statistics.csv',
-        nargs='+', type=str, metavar='param', default=None)
+                        nargs='+', type=str, metavar='param', default=None)
     parser.add_argument('--acc', help='calumn name for accuracy in train log',
-        metavar='col_name', default=None)
+                        metavar='col_name', default=None)
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if auto_params and not args.params:
         args.params = auto_params_from_file(args.path)
