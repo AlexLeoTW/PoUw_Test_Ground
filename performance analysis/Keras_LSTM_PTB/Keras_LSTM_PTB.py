@@ -30,10 +30,17 @@ start_time = time.time()    # -------------------------------------------------�
 train_data, valid_data, test_data, labelEnc = dataset.load_ptb()
 
 num_vocabulary = len(labelEnc.classes_)
-train_data_generator = KerasBatchGenerator(train_data, options.num_steps, options.batch_size,
-                                           num_vocabulary, skip_step=options.num_steps)
-valid_data_generator = KerasBatchGenerator(valid_data, options.num_steps, options.batch_size,
-                                           num_vocabulary, skip_step=options.num_steps)
+train_data_generator = KerasBatchGenerator(train_data,
+                                           num_steps=options.num_steps,
+                                           batch_size=options.batch_size,
+                                           num_vocabulary=num_vocabulary,
+                                           skip_step=options.num_steps)
+
+valid_data_generator = KerasBatchGenerator(valid_data,
+                                           num_steps=options.num_steps,
+                                           batch_size=options.batch_size,
+                                           num_vocabulary=num_vocabulary,
+                                           skip_step=options.num_steps)
 preprocess_time = time.time() - start_time   # --------------------------------┘
 
 start_time = time.time()    # -------------------------------------------------┐
