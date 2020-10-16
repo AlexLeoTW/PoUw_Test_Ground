@@ -21,8 +21,6 @@ def parse_argv():
         type=int, metavar='size', default=2)
     parser.add_argument('--stack', help='how Conv2D layers are stacked',
         choices=['independent', '2_in_a_row'], metavar='type', default='2_in_a_row')
-    # parser.add_argument('-dense', help='configure units of dense layer ex. 128',
-    #     type=int, metavar='units', default=128)
     parser.add_argument('-l', '--log', help='save detailed trainning log (.csv file)',
         dest='log_path', metavar='path')
     parser.add_argument('-m', '--model', help='save trainned moldel (.h5)',

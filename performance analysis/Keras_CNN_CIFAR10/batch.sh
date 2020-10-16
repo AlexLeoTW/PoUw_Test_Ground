@@ -10,7 +10,7 @@ CONV_FILTERS="16 32 64"
 CONV_KERNEL_SIZE="2 3 4"
 CONV_NUM="2 4"
 POOL_SIZE="2 3"
-DENSE="64 128 256"
+STACK="independent 2_in_a_row"
 
 read -r -d '' JOB_FILE_HEADER << EOM
 #!/bin/bash
@@ -27,10 +27,10 @@ function new_job_file() {
     for conv_kernel_size in $CONV_KERNEL_SIZE; do
       for conv_num in $CONV_NUM; do
         for pool_size in $POOL_SIZE; do
-          echo "$PYTHON_CMD Keras_CNN_CIFAR10.py --allow_growth --aug -conv $conv_filters $conv_kernel_size -conv_num $conv_num -pool $pool_size" >> $JOB_FILE
-          echo "sed --in-place '6,7d' \$BASENAME" >> $JOB_FILE
-          echo "$PYTHON_CMD Keras_CNN_CIFAR10.py --allow_growth --aug -conv $conv_filters $conv_kernel_size -conv_num $conv_num -pool $pool_size --stack independent" >> $JOB_FILE
-          echo "sed --in-place '6,7d' \$BASENAME" >> $JOB_FILE
+          for stack in $STACK; do
+            echo "$PYTHON_CMD Keras_CNN_CIFAR10.py --allow_growth --aug -conv $conv_filters $conv_kernel_size -conv_num $conv_num -pool $pool_size --stack "$stack >> $JOB_FILE
+            echo "sed --in-place '6,7d' \$BASENAME" >> $JOB_FILE
+          done
         done
       done
     done
