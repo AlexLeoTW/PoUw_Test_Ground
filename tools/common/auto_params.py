@@ -15,6 +15,14 @@ col_name_regex_map = {
 }
 
 
+def _read_colname(csv):
+    with open(csv, 'r') as file:
+        colnames = file.readline()
+        colnames = colnames.split(',')
+        colnames = list(map(lambda col: col.replace('"', ''), colnames))
+    return colnames
+
+
 # return loc of the first element matched
 def _match_in_list(regex, lis):
     loc = map(lambda name: re.search(regex, name) is not None, lis)
@@ -27,16 +35,14 @@ def auto_params(col_names):
 
 
 def auto_params_from_file(path):
-    with open(path, 'r') as file:
-        colnames = file.readline()
-        colnames = colnames.split(',')
-        return auto_params(colnames)
+    colnames = _read_colname(path)
+    return auto_params(colnames)
 
 
 def _first_log_path_from_statistics(path):
     with open(path, 'r') as file:
         file.readline()  # skip first line
-        log_path = file.readline().strip().split(',')[-1]
+        log_path = file.readline().strip().split(',')[-1].replace('"', '')
 
         # join log_path column with path inputed
         dir = os.path.dirname(path)
@@ -60,9 +66,8 @@ def auto_acc_loss_from_file(path, is_statistics=True):
     if is_statistics:
         path = _first_log_path_from_statistics(path)
 
-    with open(path, 'r') as log:
-        colnames = log.readline().split(',')
-        return auto_acc_loss(colnames)
+    colnames = _read_colname(path)
+    return auto_acc_loss(colnames)
 
 
 def parse_argv(args=None, auto_params=True):
