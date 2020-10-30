@@ -44,8 +44,8 @@ def draw_per_avg():
 
 def draw_per_param_avg():
     plt.figure(figsize=figsize)
-    collected = statistics.deep_collect([options.acc, 'end_time'])
-    collected_avg = statistics.deep_collect([options.acc, 'end_time'], avg=True)
+    collected = statistics.deep_collect(['val_acc', 'end_time'])
+    collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=True)
 
     for param in options.params:
 
@@ -54,10 +54,10 @@ def draw_per_param_avg():
         for conv1_filters in collected_avg[param].drop_duplicates().values:
 
             selected = collected_avg[collected_avg[param] == conv1_filters]
-            plt.scatter(selected['end_time'], selected[options.acc], label=str(conv1_filters))
+            plt.scatter(selected['end_time'], selected['val_acc'], label=str(conv1_filters))
 
         plt.xlabel('end_time(s)')
-        plt.ylabel('{acc}(%)'.format(acc=options.acc))
+        plt.ylabel('{acc}(%)'.format(acc='val_acc'))
         plt.legend(title=param)
         image_path = os.path.join(os.path.dirname(options.path), 'acc_growth_{}.jpg'.format(param))
         plt.savefig(image_path)
