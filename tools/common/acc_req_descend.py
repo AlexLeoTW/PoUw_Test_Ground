@@ -1,6 +1,7 @@
 import random
 import string
 import numpy as np
+import matplotlib
 from scipy.optimize import fsolve
 
 inf = float('inf')
@@ -62,15 +63,29 @@ def find_first_hit(df, params):
     return first_hit
 
 
-def draw_decending_acc_requirement(plt, **kwargs):
-    x_min, x_max = plt.xlim()
+def draw_decending_acc_requirement(draw, **kwargs):
+    if isinstance(draw, matplotlib.axes.Axes):
+        x_min, x_max = draw.get_xlim()
+        y_min, y_max = draw.get_ylim()
+    else:
+        # assume matplotlib.pyplot
+        x_min, x_max = draw.xlim()
+        y_min, y_max = draw.ylim()
+
     x_min = max(x_min, 0)
+    y_min = max(y_min, 0)
+    y_max = min(y_max, 1)
 
     xs = np.arange(x_min, x_max, 5)
     ys = acc_requirement(xs)
+    xys = list(zip(xs, ys))
+    xys = list(filter(lambda xy: xy[1] >= y_min, xys))
+    xys = list(filter(lambda xy: xy[1] <= y_max, xys))
+    xs = list(map(lambda xy: xy[0], xys))
+    ys = list(map(lambda xy: xy[1], xys))
 
     default_plot_arg = {'c': '#303030', 'linestyle': '--', 'linewidth': '2'}
-    plt.plot(xs, ys, **{**default_plot_arg, **kwargs})
+    draw.plot(xs, ys, **{**default_plot_arg, **kwargs})
 
 
 def x_y_lim(first_hits, margin=0, expand=False,
