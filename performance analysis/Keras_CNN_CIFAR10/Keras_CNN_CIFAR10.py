@@ -62,16 +62,21 @@ if options.stack == 'independent':
         model.add(Dropout(rate=0.25))
 
 elif options.stack == '2_in_a_row':
-    model.add(Conv2D(filters=options.conv[0], kernel_size=(options.conv[1], options.conv[1]), padding='same',
+    model.add(Conv2D(filters=options.conv[0],
+                     kernel_size=(options.conv[1], options.conv[1]),
+                     padding='same',
                      activation='relu',
                      input_shape=x_train.shape[1:]))
-    model.add(Conv2D(filters=options.conv[0], kernel_size=(options.conv[1], options.conv[1]),
+    model.add(Conv2D(filters=options.conv[0],
+                     kernel_size=(options.conv[1], options.conv[1]),
                      activation='relu'))
     model.add(MaxPooling2D(pool_size=(options.pool, options.pool)))
     model.add(Dropout(rate=0.25))
 
     for num in range(3, options.conv_num+1, 2):
-        model.add(Conv2D(filters=options.conv[0], kernel_size=(options.conv[1], options.conv[1]),
+        model.add(Conv2D(filters=options.conv[0],
+                         kernel_size=(options.conv[1], options.conv[1]),
+                         padding='same',
                          activation='relu'))
         model.add(Conv2D(filters=options.conv[0], kernel_size=(options.conv[1], options.conv[1]),
                          activation='relu'))
@@ -83,9 +88,9 @@ model.add(Dense(units=512, activation='relu'))
 model.add(Dropout(rate=0.5))
 model.add(Dense(units=num_classes, activation='softmax'))
 
-optimizers = keras.optimizers.Adam(lr=0.0002)
+rmsprop = keras.optimizers.RMSprop(learning_rate=0.0001, decay=1e-6)
 model.compile(loss='categorical_crossentropy',
-              optimizer=optimizers,
+              optimizer=rmsprop,
               metrics=['accuracy'])
 startup_time = time.time() - start_time   # -----------------------------------┘
 
@@ -113,8 +118,7 @@ else:
         zoom_range=0.1,
         channel_shift_range=10,
         fill_mode='nearest',
-        horizontal_flip=True,
-        data_format='channels_last'
+        horizontal_flip=True
     )
     datagen.fit(x_train)
 
