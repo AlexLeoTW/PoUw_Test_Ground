@@ -88,9 +88,9 @@ model.add(Dense(units=512, activation='relu'))
 model.add(Dropout(rate=0.5))
 model.add(Dense(units=num_classes, activation='softmax'))
 
-rmsprop = keras.optimizers.RMSprop(learning_rate=0.0001, decay=1e-6)
+adam = keras.optimizers.Adam(lr=0.0002)
 model.compile(loss='categorical_crossentropy',
-              optimizer=rmsprop,
+              optimizer=adam,
               metrics=['accuracy'])
 startup_time = time.time() - start_time   # -----------------------------------┘
 
