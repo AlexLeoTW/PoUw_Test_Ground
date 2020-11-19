@@ -1,7 +1,9 @@
 import keras
 import sys
 import importlib
-from packaging import version
+import re
+
+regex_ver = '(?P<ver>[\d.]+)(?P<subfix>\D*$)'
 
 
 def is_backend_tf():
@@ -10,11 +12,17 @@ def is_backend_tf():
     return False
 
 
+def __version_to_tuple(str_ver):
+    return tuple(map(int, str_ver.split('.')))
+
+
 def _is_tf_v2(tf=None):
     if not tf:
         tf = importlib.import_module('tensorflow')
 
-    return version.parse(tf.__version__) > version.parse('2.0.0a0')
+    current = re.match(regex_ver, tf.__version__).groupdict()
+    current = __version_to_tuple(current['ver'])
+    return current > tuple([2])
 
 
 def allow_growth():
