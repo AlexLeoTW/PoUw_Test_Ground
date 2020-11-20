@@ -30,6 +30,8 @@ def parse_argv():
 
     parser.add_argument('--allow_growth', help='whether to set allow_growth for TensorFlow',
         action='store_true', default=False)
+    parser.add_argument('--fp16', help='whether to use mixed_precision / mixed_float16 training',
+        action='store_true', default=False)
 
     args = parser.parse_args()
 

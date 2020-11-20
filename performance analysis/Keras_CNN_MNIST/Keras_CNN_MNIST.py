@@ -31,6 +31,8 @@ options = cmdargv.parse_argv()
 # TensorFlow wizardry
 if options.allow_growth:
     tf_tricks.allow_growth()
+if options.fp16:
+    tf_tricks.mixed_precision()
 
 start_time = time.time()    # -------------------------------------------------┐
 # the data, split between train and test sets

@@ -30,6 +30,8 @@ options = cmdargv.parse_argv()
 # TensorFlow wizardry
 if options.allow_growth:
     tf_tricks.allow_growth()
+if options.fp16:
+    tf_tricks.mixed_precision()
 
 start_time = time.time()    # -------------------------------------------------┐
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()

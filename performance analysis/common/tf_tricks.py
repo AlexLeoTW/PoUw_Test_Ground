@@ -75,3 +75,15 @@ def import_layer(name):
         return tf.compat.v1.keras.layers.__dict__[name]
     else:
         return tf.keras.layers.__dict__[name]
+
+
+def mixed_precision():
+    if not is_backend_tf():
+        print('backend not support "mixed_precision" function.', file=sys.stderr)
+        return
+
+    from tensorflow.keras.mixed_precision import experimental as _mixed_precision
+    policy = _mixed_precision.Policy('mixed_float16')
+    _mixed_precision.set_policy(policy)
+    print('Compute dtype: %s' % policy.compute_dtype)
+    print('Variable dtype: %s' % policy.variable_dtype)
