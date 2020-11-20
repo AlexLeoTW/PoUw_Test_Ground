@@ -23,13 +23,13 @@ def parse_argv():
     args = parser.parse_args()
 
     if args.log_path is None:
-        args.log_path = '{}_{}.csv'.format(
-            args.hidden, timestamp
+        args.log_path = '{num_hidden}_{timestamp}.csv'.format(
+            num_hidden=args.hidden, timestamp=timestamp
         )
 
     if args.model_path is None:
-        args.model_path = '{}_{}.h5'.format(
-            args.hidden, timestamp
+        args.model_path = '{num_hidden}_{timestamp}.h5'.format(
+            num_hidden=args.hidden, timestamp=timestamp
         )
 
     args.log_path = os.path.abspath(args.log_path)

@@ -24,9 +24,9 @@ def parse_argv():
                         action='store_true')
 
     parser.add_argument('-l', '--log', help='save detailed trainning log (.csv file)',
-        metavar='path', dest='log_path')
+        metavar='path', dest='log_path')  # default: defined below
     parser.add_argument('-m', '--model', help='save/load trainned moldel (.h5 file)',
-        metavar='path', dest='model_path')
+        metavar='path', dest='model_path')  # default: defined below
     parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
         metavar='path', dest='statistics_path', default='statistics.csv')
 
@@ -36,10 +36,14 @@ def parse_argv():
     args = parser.parse_args()
 
     if args.log_path is None:
-        args.log_path = '{}_{}_{}_{}_{}.csv'.format(args.num_steps, args.batch_size, args.embedding_size, args.lstm2_size, timestamp)
+        args.log_path = '{}_{}_{}_{}_{}.csv'.format(
+            args.num_steps, args.batch_size, args.embedding_size, args.lstm2_size, timestamp
+        )
 
     if args.model_path is None:
-        args.model_path = '{}_{}_{}_{}_{}.h5'.format(args.num_steps, args.batch_size, args.embedding_size, args.lstm2_size, timestamp)
+        args.model_path = '{}_{}_{}_{}_{}.h5'.format(
+            args.num_steps, args.batch_size, args.embedding_size, args.lstm2_size, timestamp
+        )
 
     args.log_path = os.path.abspath(args.log_path)
     args.model_path = os.path.abspath(args.model_path)

@@ -22,9 +22,9 @@ def parse_argv():
     parser.add_argument('--stack', help='how Conv2D layers are stacked',
         choices=['independent', '2_in_a_row'], metavar='type', default='2_in_a_row')
     parser.add_argument('-l', '--log', help='save detailed trainning log (.csv file)',
-        dest='log_path', metavar='path')
+        dest='log_path', metavar='path')  # default: defined below
     parser.add_argument('-m', '--model', help='save trainned moldel (.h5)',
-        dest='model_path', metavar='path')
+        dest='model_path', metavar='path')  # default: defined below
     parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
         dest='statistics_path', metavar='path', default='statistics.csv')
 
@@ -58,19 +58,21 @@ def parse_argv():
         error_and_exit(parser, e)
 
     if args.log_path is None:
-        args.log_path = '{aug}_{filters}_{kernel_size}_{conv_num}_{pool}_{stack}_{timestamp}.csv'.format(
-            aug='aug' if args.aug else 'none',
-            filters=args.conv[0], kernel_size=args.conv[1], conv_num=args.conv_num,
-            pool=args.pool, stack=args.stack,
-            timestamp=timestamp
+        args.log_path = '{}_{}_{}_{}_{}_{}_{}.csv'.format(
+            'aug' if args.aug else 'none',
+            args.conv[0],  # conv1_filters
+            args.conv[1],  # conv1_kernel_size
+            args.conv_num,  # num_conv_layer
+            args.pool, args.stack, timestamp
         )
 
     if args.model_path is None:
-        args.model_path = '{aug}_{filters}_{kernel_size}_{conv_num}_{pool}_{stack}_{timestamp}.h5'.format(
-            aug='aug' if args.aug else 'none',
-            filters=args.conv[0], kernel_size=args.conv[1], conv_num=args.conv_num,
-            pool=args.pool, stack=args.stack,
-            timestamp=timestamp
+        args.model_path = '{}_{}_{}_{}_{}_{}_{}.h5'.format(
+            'aug' if args.aug else 'none',
+            args.conv[0],  # conv1_filters
+            args.conv[1],  # conv1_kernel_size
+            args.conv_num,  # num_conv_layer
+            args.pool, args.stack, timestamp
         )
 
     args.log_path = os.path.abspath(args.log_path)

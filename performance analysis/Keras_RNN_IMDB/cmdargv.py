@@ -16,9 +16,9 @@ def parse_argv():
         metavar='neuron', default='LSTM')
 
     parser.add_argument('-l', '--log', help='save detailed trainning log (.csv file)',
-        dest='log_path', metavar='path')
+        dest='log_path', metavar='path')  # default: defined below
     parser.add_argument('-m', '--model', help='save trainned moldel (.h5)',
-        dest='model_path', metavar='path')
+        dest='model_path', metavar='path')  # default: defined below
     parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
         dest='statistics_path', metavar='path', default='statistics.csv')
 

@@ -2,6 +2,7 @@ import os
 import time
 import argparse
 
+
 def parse_argv():
     parser = argparse.ArgumentParser()
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
@@ -15,11 +16,9 @@ def parse_argv():
     parser.add_argument('-dense', help='configure units of dense layer ex. 128',
         type=int, metavar='units', default=128)
     parser.add_argument('-l', '--log', help='save detailed trainning log (.csv file)',
-        dest='log_path', metavar='path')
-        # default: [conv1_filters]_[conv1_kernel_size]_[conv2]_[pool_size]_[dense]_[timestamp].csv
+        dest='log_path', metavar='path')  # default: defined below
     parser.add_argument('-m', '--model', help='save trainned moldel (.h5)',
-        dest='model_path', metavar='path')
-        # default: [conv1_filters]_[conv1_kernel_size]_[conv2]_[pool_size]_[dense]_[timestamp].h5
+        dest='model_path', metavar='path')  # default: defined below
     parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
         dest='statistics_path', metavar='path', default='statistics.csv')
 
@@ -28,16 +27,18 @@ def parse_argv():
 
     args = parser.parse_args()
 
-    if args.log_path == None:
+    if args.log_path is None:
         args.log_path = '{}_{}_{}_{}_{}_{}.csv'.format(
-            args.conv1[0],  args.conv1[1],      args.conv2, args.pool,  args.dense, timestamp
-          # [conv1_filters] [conv1_kernel_size] [conv2]     [pool_size] [dense]     [timestamp]
+            args.conv1[0],  # conv1_filters
+            args.conv1[1],  # conv1_kernel_size
+            args.conv2, args.pool, args.dense, timestamp
         )
 
-    if args.model_path == None:
+    if args.model_path is None:
         args.model_path = '{}_{}_{}_{}_{}_{}.h5'.format(
-            args.conv1[0],  args.conv1[1],      args.conv2, args.pool,  args.dense, timestamp
-          # [conv1_filters] [conv1_kernel_size] [conv2]     [pool_size] [dense]     [timestamp]
+            args.conv1[0],  # conv1_filters
+            args.conv1[1],  # conv1_kernel_size
+            args.conv2, args.pool, args.dense, timestamp
         )
 
     args.log_path = os.path.abspath(args.log_path)

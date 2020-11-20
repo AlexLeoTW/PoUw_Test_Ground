@@ -33,16 +33,36 @@ def parse_argv():
     args = parser.parse_args()
 
     if args.log_path is None:
-        args.log_path = f'{args.noise_dim}__{args.gen_l1}_{args.gen_l2}__{args.disc_l1}_{args.disc_l2}__{timestamp}.csv'
+        args.log_path = '{}__{}_{}__{}_{}__{}.csv'.format(
+            args.noise_dim,
+            args.gen_l1, args.gen_l2,
+            args.disc_l1, args.disc_l2,
+            timestamp
+        )
 
     if args.gen_model_path is None:
-        args.gen_model_path = f'{args.noise_dim}__{args.gen_l1}_{args.gen_l2}__{args.disc_l1}_{args.disc_l2}__{timestamp}_gen.h5'
+        args.gen_model_path = '{}__{}_{}__{}_{}__{}_gen.h5'.format(
+            args.noise_dim,
+            args.gen_l1, args.gen_l2,
+            args.disc_l1, args.disc_l2,
+            timestamp
+        )
 
     if args.disc_model_path is None:
-        args.disc_model_path = f'{args.noise_dim}__{args.gen_l1}_{args.gen_l2}__{args.disc_l1}_{args.disc_l2}__{timestamp}_disc.h5'
+        args.disc_model_path = '{}__{}_{}__{}_{}__{}_disc.h5'.format(
+            args.noise_dim,
+            args.gen_l1, args.gen_l2,
+            args.disc_l1, args.disc_l2,
+            timestamp
+        )
 
     if args.img_dir is None:
-        args.img_dir = f'{args.noise_dim}__{args.gen_l1}_{args.gen_l2}__{args.disc_l1}_{args.disc_l2}__{timestamp}'
+        args.img_dir = '{}__{}_{}__{}_{}__{}'.format(
+            args.noise_dim,
+            args.gen_l1, args.gen_l2,
+            args.disc_l1, args.disc_l2,
+            timestamp
+        )
 
     args.log_path = os.path.abspath(args.log_path)
     args.gen_model_path = os.path.abspath(args.gen_model_path)
