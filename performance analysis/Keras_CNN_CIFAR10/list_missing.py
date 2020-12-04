@@ -8,12 +8,13 @@ conv_num = [2, 4]
 pool = [2, 3]
 stack = ['independent', '2_in_a_row']
 
-if not os.path.isfile(sys.argv[1]):
+stat_path = sys.argv[1] if len(sys.argv) >= 2 else 'statistics.csv'
+if not os.path.isfile(stat_path):
     raise FileNotFoundError('file not found')
     sys.exit(1)
 
 
-df = pd.read_csv(sys.argv[1])
+df = pd.read_csv(stat_path)
 
 params = pd.DataFrame(columns=['conv_filters', 'conv_kernel_size', 'conv_num', 'pool', 'stack'])
 
