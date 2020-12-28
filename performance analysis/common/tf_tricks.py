@@ -3,7 +3,7 @@ import sys
 import importlib
 import re
 
-regex_ver = '(?P<ver>[\d.]+)(?P<subfix>\D*$)'
+regex_ver = r'(?P<ver>[\d.]+)(?P<subfix>\D*$)'
 
 
 def is_backend_tf():
@@ -23,6 +23,14 @@ def _is_tf_v2(tf=None):
     current = re.match(regex_ver, tf.__version__).groupdict()
     current = __version_to_tuple(current['ver'])
     return current > tuple([2])
+
+
+# Keras 2.2.5 was the last release of Keras implementing the 2.2.* API. It was the last release to only support TensorFlow 1 (as well as Theano and CNTK).
+def _is_deprecated_keras(keras=keras):
+    if __version_to_tuple(keras.__version__) <= (2, 2, 5):
+        return True
+    else:
+        False
 
 
 def allow_growth():
@@ -70,6 +78,9 @@ def import_layer(name):
 
     if not is_backend_tf():
         return keras.layers.__dict__[name]
+
+    if _is_deprecated_keras():
+        raise ImportError('Keras version not supported')
 
     if _is_tf_v2(tf) and is_cudnn(name):
         return tf.compat.v1.keras.layers.__dict__[name]
