@@ -47,6 +47,7 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 startup_time = time.time() - start_time   # -----------------------------------┘
 
+model.summary()
 custom_logger = CustomLogger(options.log_path)
 
 start_time = time.time()    # -------------------------------------------------┐
