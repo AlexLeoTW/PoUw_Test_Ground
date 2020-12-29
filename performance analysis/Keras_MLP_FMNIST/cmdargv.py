@@ -7,31 +7,31 @@ def parse_argv():
     parser = argparse.ArgumentParser()
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
 
-    parser.add_argument('-hidden', help='configure size of hidden layer ex. 256',
+    parser.add_argument('-hidden', nargs='+', help='configure size of hidden layer ex. 256',
                         type=int, metavar='units', default=128)
 
     parser.add_argument('-l', '--log', help='save detailed trainning log (.csv file)',
-        dest='log_path', metavar='path')  # default: see below
+                        dest='log_path', metavar='path')  # default: see below
     parser.add_argument('-m', '--model', help='save trainned moldel (.h5)',
-        dest='model_path', metavar='path')  # default: see below
+                        dest='model_path', metavar='path')  # default: see below
     parser.add_argument('-s', '--statistics', help='where to store statistics file (.csv)',
-        dest='statistics_path', metavar='path', default='statistics.csv')
+                        dest='statistics_path', metavar='path', default='statistics.csv')
 
     parser.add_argument('--allow_growth', help='whether to set allow_growth for TensorFlow',
-            action='store_true', default=False)
+                        action='store_true', default=False)
     parser.add_argument('--fp16', help='whether to use mixed_precision / mixed_float16 training',
-        action='store_true', default=False)
+                        action='store_true', default=False)
 
     args = parser.parse_args()
 
     if args.log_path is None:
         args.log_path = '{num_hidden}_{timestamp}.csv'.format(
-            num_hidden=args.hidden, timestamp=timestamp
+            num_hidden='_'.join(map(lambda x: str(x), args.hidden)), timestamp=timestamp
         )
 
     if args.model_path is None:
         args.model_path = '{num_hidden}_{timestamp}.h5'.format(
-            num_hidden=args.hidden, timestamp=timestamp
+            num_hidden='_'.join(map(lambda x: str(x), args.hidden)), timestamp=timestamp
         )
 
     args.log_path = os.path.abspath(args.log_path)

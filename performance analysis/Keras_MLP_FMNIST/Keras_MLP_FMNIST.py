@@ -38,7 +38,8 @@ preprocess_time = time.time() - start_time   # --------------------------------‚
 start_time = time.time()    # -------------------------------------------------‚îê
 model = Sequential()
 model.add(Flatten(input_shape=(28, 28)))
-model.add(Dense(options.hidden, activation='relu'))
+for hidden in options.hidden:
+    model.add(Dense(hidden, activation='relu'))
 model.add(Dense(10))
 
 model.compile(optimizer='adam',
@@ -70,12 +71,17 @@ print('saving model "{}"...'.format(os.path.basename(options.model_path)))
 save_result.save_model(options.model_path, model)
 
 print('saving statistics "{}"...'.format(os.path.basename(options.statistics_path)))
-save_result.save_statistics(options.statistics_path, entries={
-    'hidden:': options.hidden,
+entries = {}
+
+for index, hidden in zip(range(len(options.hidden)), options.hidden):
+    entries[f'hidden_{index + 1}'] = hidden
+
+entries.update({
     'acc_score(%)': acc_score,
     'preprocess_time': preprocess_time,
     'startup_time': startup_time,
     'train_time': train_time,
     'val_time': val_time,
-    'log_path': options.log_path
-}, drop_duplicates=False)
+    'log_path': options.log_path})
+
+save_result.save_statistics(options.statistics_path, entries, drop_duplicates=False)
