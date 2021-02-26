@@ -1,0 +1,57 @@
+env:
+  # name or (venv) path of python executable
+  python_bin: python3
+  # argumtnst passing to (attached to) the python bin
+  python_args: []
+  # filename of batch job information
+  job_file: batch_job.yaml
+jobs:
+  # name for the job, use whatever you want
+  single_layer:
+    # what to execute
+    script: Keras_MLP_FMNIST.py
+    # argumtnst passing to (attached to) the script, support following types:
+    #   * -foo
+    #   * [1, 2, 3]
+    #   * -foo: [2, 4]
+    #   * -foo: [[1, 2, 3], [10, 20]]
+    # warning: space is not supported yet (escape by "'str w/ space'")
+    args:
+      - --allow_growth
+      - -hidden: [64, 128, 256]
+
+    # how many times through this job
+    loop: 3
+    # check if all the training logs/output (filename Only) are present
+    check:
+      # '64_2021-02-26 07:15:04.csv'
+      #   ==> ['64']
+      filename: '^(\d+)_\d{4}.+.h5'
+      # match arguments by "token",
+      #   e.g. [1] will match [123] in ['--foo', 123, '--bar', 'xyz']
+      match: [2]
+  # name for the job, use whatever you want
+  double_layer:
+    # what to execute
+    script: Keras_MLP_FMNIST.py
+    # argumtnst passing to (attached to) the script, support following types:
+    #   * -foo
+    #   * [1, 2, 3]
+    #   * -foo: [2, 4]
+    #   * -foo: [[1, 2, 3], [10, 20]]
+    # warning: space is not supported yet (escape by "'str w/ space'")
+    args:
+      - --allow_growth
+      - -hidden: [64, 128, 256]
+      - 16
+
+    # how many times through this job
+    loop: 3
+    # check if all the training logs/output (filename Only) are present
+    check:
+      # '128_16_2021-02-26 07:13:38.csv'
+      #   ==> ['128', '16']
+      filename: '^(\d+)_(\d+)_\d{4}.+.h5'
+      # match arguments by "token",
+      #   e.g. [1] will match [123] in ['--foo', 123, '--bar', 'xyz']
+      match: [2, 3]

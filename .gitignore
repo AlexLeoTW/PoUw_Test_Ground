@@ -3,6 +3,7 @@ dataset/
 
 # batch jobs
 jobs.sh
+batch_job.yaml
 
 # test result
 *.csv

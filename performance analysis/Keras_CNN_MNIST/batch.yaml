@@ -1,0 +1,35 @@
+env:
+  # name or (venv) path of python executable
+  python_bin: python3
+  # argumtnst passing to (attached to) the python bin
+  python_args: []
+  # filename of batch job information
+  job_file: batch_job.yaml
+  # use de-dup feature to reduce file length, Default: False
+  yqml_reference: True
+jobs:
+  # name for the job, use whatever you want
+  mnist:
+    # what to execute
+    script: Keras_CNN_MNIST.py
+    # argumtnst passing to (attached to) the script, support following types:
+    #   * -foo
+    #   * [1, 2, 3]
+    #   * -foo: [2, 4]
+    #   * -foo: [[1, 2, 3], [10, 20]]
+    # warning: space is not supported yet (escape by "'str w/ space'")
+    args:
+      - -conv1: [[16, 32, 64], [2, 3, 4]]
+      - -conv2: [16, 32, 64]
+      - -pool: [2, 3]
+      - -dense: [64, 128, 256]
+    # how many times through this job
+    loop: 3
+    # check if all the training logs/output (filename Only) are present
+    check:
+      # '16_2_16_2_128_2020-11-25 09:46:13.csv'
+      #   ==> ['16', '2', '16', '2', '128']
+      filename: '^(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_\d{4}.+.h5'
+      # match arguments by "token",
+      #   e.g. [1] will match [123] in ['--foo', 123, '--bar', 'xyz']
+      match: [1, 2, 4, 6, 8]

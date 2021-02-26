@@ -1,0 +1,35 @@
+env:
+  # name or (venv) path of python executable
+  python_bin: python3
+  # argumtnst passing to (attached to) the python bin
+  python_args: []
+  # filename of batch job information
+  job_file: batch_job.yaml
+  # use de-dup feature to reduce file length, Default: False
+  yqml_reference: True
+jobs:
+  # name for the job, use whatever you want
+  rnns:
+    # what to execute
+    script: Keras_RNN_IMDB.py
+    # argumtnst passing to (attached to) the script, support following types:
+    #   * -foo
+    #   * [1, 2, 3]
+    #   * -foo: [2, 4]
+    #   * -foo: [[1, 2, 3], [10, 20]]
+    # warning: space is not supported yet (escape by "'str w/ space'")
+    args:
+      - --type: [SimpleRNN, GRU, LSTM, CuDNNGRU, CuDNNLSTM]
+      - --feature: [10000, 20000, 40000]
+      - --embd: [64, 128, 256]
+
+    # how many times through this job
+    loop: 3
+    # check if all the training logs/output (filename Only) are present
+    check:
+      # 'CuDNNGRU_10000_128_2020-11-26_07:38:06.csv'
+      #   ==> ['CuDNNGRU', '10000', '128']
+      filename: '^([a-zA-Z]+)_(\d+)_(\d+)_\d{4}.+.csv'
+      # match arguments by "token",
+      #   e.g. [1] will match [123] in ['--foo', 123, '--bar', 'xyz']
+      match: [1, 3, 5]

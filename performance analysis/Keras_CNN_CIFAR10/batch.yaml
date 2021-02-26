@@ -1,0 +1,37 @@
+env:
+  # name or (venv) path of python executable
+  python_bin: python3
+  # argumtnst passing to (attached to) the python bin
+  python_args: []
+  # filename of batch job information
+  job_file: batch_job.yaml
+  # use de-dup feature to reduce file length, Default: False
+  yqml_reference: True
+jobs:
+  # name for the job, use whatever you want
+  cifar10:
+    # what to execute
+    script: Keras_CNN_CIFAR10.py
+    # argumtnst passing to (attached to) the script, support following types:
+    #   * -foo
+    #   * [1, 2, 3]
+    #   * -foo: [2, 4]
+    #   * -foo: [[1, 2, 3], [10, 20]]
+    # warning: space is not supported yet (escape by "'str w/ space'")
+    args:
+      - --allow_growth
+      - --aug
+      - -conv: [[16, 32, 64], [2, 3, 4]]
+      - -conv_num: [2, 4]
+      - -pool: [2, 3]
+      - --stack: [independent, 2_in_a_row]
+    # how many times through this job
+    loop: 3
+    # check if all the training logs/output (filename Only) are present
+    check:
+      # aug_16_2_4_2_independent_2021-02-23_07:10:21.csv
+      #   ==> ['16', '2', '4', '2', 'independent']
+      filename: '^aug_(\d+)_(\d+)_(\d+)_(\d+)_(\S+)_\d{4}.+.h5'
+      # match arguments by "token",
+      #   e.g. [1] will match [123] in ['--foo', 123, '--bar', 'xyz']
+      match: [3, 4, 6, 8, 10]
