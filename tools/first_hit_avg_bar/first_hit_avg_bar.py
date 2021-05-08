@@ -1,30 +1,63 @@
 import os
+import argparse
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from statistics import Statistics
-from auto_params import parse_argv
-import acc_req_descend
+from tabulate import tabulate
 
-colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
-
-options = parse_argv()
-statistics = Statistics(options.path, options.params, normalize_colname=True)
-collected_avg = statistics.deep_collect(['val_acc', 'end_time'], avg=False)
-first_hits = acc_req_descend.find_first_hit(collected_avg, options.params)
-
-# =========== end setting up ===========
-
-fig, ax = plt.subplots()
+import statistics as stat_tools
+import acc_req_descend as acc
+import plot_color as c
 
 
-def first_hit_avg(df, param):
-    selected_cols = df.loc[:, (param, 'end_time')]
-    avgs = selected_cols.groupby([param]).mean()
-    avgs['stddiv'] = selected_cols.groupby([param]).std()['end_time']
-    avgs.reset_index(inplace=True)
-    return avgs
+# figsize = [15, 8]
+figsize = None
 
 
-def autolabel(rects):
+def parse_argv():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path',
+                        help='path to statistics.csv')
+    parser.add_argument('--params', metavar='col_name', nargs='+', default=None,
+                        help='plot the forground of the graph with averaged data')
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help='not showing figure, just save them')
+    parser.add_argument('-t', '--trans', dest='facecolor', action='store_true',
+                        help='use transparent background')
+
+    args = parser.parse_args()
+
+    args.facecolor = c.transparent if args.facecolor else c.facecolor
+
+    return args
+
+
+def __extract__(first_hit_df, param):
+    param_vals = []
+    avg_end_times = []
+    stddiv_end_times = []
+
+    for param_val, local_df in first_hit_df.groupby(param).__iter__():
+        param_vals.append(param_val)
+        avg_end_times.append(local_df['end_time'].mean())
+        stddiv_end_times.append(local_df['end_time'].std())
+
+    param_vals = [str(val) for val in param_vals]
+
+    # just print table
+    __print_table__(param, param_vals, avg_end_times, stddiv_end_times)
+
+    return param_vals, avg_end_times, stddiv_end_times
+
+
+def __print_table__(param, param_vals, avg_end_times, stddiv_end_times):
+    print(tabulate({param: param_vals,
+                    'end_time': avg_end_times,
+                    'stddiv': stddiv_end_times},
+                    headers='keys', tablefmt='github'))
+
+
+def autolabel(ax, rects):
     """Attach a text label above each bar in *rects*, displaying its height."""
     for rect in rects:
         height = rect.get_height()
@@ -35,18 +68,48 @@ def autolabel(rects):
                     ha='center', va='bottom')
 
 
-for param in options.params:
-    print('param = {param}'.format(param=param))
+def draw_fig(first_hit_df, param, facecolor=c.white):
 
-    avgs = first_hit_avg(first_hits, param)
-    avgs[param] = avgs[param].astype('str')
+    fig, ax = plt.subplots(figsize=figsize)
+    param_vals, avg_end_times, stddiv_end_times = __extract__(first_hit_df, param)
 
-    print(avgs)
+    bars = ax.bar(param_vals, avg_end_times, yerr=stddiv_end_times,
+                  color=c.fg_dot_color)
+    autolabel(ax, bars)
 
-    rects = plt.bar(avgs.loc[:, param], avgs.loc[:, 'end_time'], yerr=avgs.loc[:, 'stddiv'], color=colors)
-    autolabel(rects)
-    plt.xlabel(param)
-    plt.ylabel("end_time(s)")
-    plt.title('first hit avg')
-    plt.savefig(os.path.join(os.path.dirname(options.path), f'first_hit_avg_bar_{param}.jpg'))
-    plt.cla()
+    ax.set_xlabel(param)
+    ax.set_ylabel("end_time(s)")
+
+    fig.set_facecolor(facecolor)
+    ax.set_facecolor(facecolor)
+
+    return fig
+
+
+def main():
+    options = parse_argv()
+
+    statistics = stat_tools.Statistics(path=options.path, params=options.params)
+    base_dir = os.path.dirname(options.path)
+
+    first_hit_df = stat_tools.find_first_hits(statistics, acc.acc_requirement)
+
+    for param in statistics.params:
+        print(f'param = {param}')
+
+        fig = draw_fig(first_hit_df, param=param, facecolor=options.facecolor)
+
+        # showing figure in window
+        if not options.quiet:
+            plt.show()
+
+        # save image to the same directory as statistics.csv
+        image_path = os.path.join(base_dir, f'first_hit_avg_bar_{param}_.png')
+        fig.savefig(image_path)
+
+        # close current figure before drawing again
+        plt.close(fig)
+
+
+if __name__ == '__main__':
+    main()

@@ -52,6 +52,7 @@ def _first_log_path_from_statistics(path):
         return log_path
 
 
+# generate normalized/unified col. name for a training log
 def auto_acc_loss(col_names):
     acc_loss = col_name_regex_map['epochs'].copy()
 

@@ -16,104 +16,50 @@ def acc_requirement(time_s):
 
 
 # reversed acc_requirement function (takes acc as input)
-def acc_requirement_reverse(acc):
+def time_acc_pass(acc):
     def acc_req_offset(time):
         return acc_requirement(time) - acc
     return fsolve(acc_req_offset, 1e-3)[0]
 
 
-# Generate random string
-def _randomString(stringLength=10):
-    """Generate a random string of fixed length """
-    letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for i in range(stringLength))
+# return first_hit time
+def find_first_hit(times, accs):
+    # always consider best 'acc' so far
+    accs = np.maximum.accumulate(accs)
+
+    # just in case a set of training can't passs acc_requirement() entire time
+    max_acc = accs[-1]
+    times = np.append(times, time_acc_pass(max_acc))
+    accs = np.append(accs, max_acc)
+
+    passed = accs > acc_requirement(times)
+    idx_first_passed = np.argmax(passed)
+
+    return times[idx_first_passed], accs[idx_first_passed]
 
 
-# returns a pandas DataFrame contains
-def find_first_hit(df, params):
-    col_name = '{}_pass'.format(_randomString(5))
-
-    # insert a new column named XXXXX_pass indicates a hit
-    df.insert(loc=len(params), column=col_name,
-              value=df['val_acc'] >= acc_requirement(df['end_time']))
-
-    # keep the "first" hit record, drop the others
-    first_hit = df[df[col_name]]
-    first_hit = first_hit.drop_duplicates(subset=params, keep='first')
-
-    # cacultate hitting time with acc of last epoch
-    delayed_hits = df.copy()
-    delayed_hits = delayed_hits.sort_values(by='val_acc', ascending=False)  # descending
-    delayed_hits = delayed_hits.drop_duplicates(subset=params, keep='first')
-    def update_val_acc(col):
-        col['end_time'] = acc_requirement_reverse(col['val_acc'])
-        return col
-    delayed_hits = delayed_hits.apply(update_val_acc, axis='columns')
-
-    # fill missing hits with delayed_hits
-    first_hit = first_hit.append(delayed_hits)
-    first_hit = first_hit.drop_duplicates(subset=params, keep='first')
-    first_hit = first_hit.sort_values(by=params)
-    first_hit.reset_index(drop=True, inplace=True)
-
-    # delete(drop) XXXXX_pass column
-    df.drop(columns=[col_name], inplace=True)
-    first_hit.drop(columns=[col_name], inplace=True)
-
-    return first_hit
+# return start_time and end_time of the acc-req. plot
+def get_x_range():
+    end_time = time_acc_pass(acc=0)
+    return (0, end_time)
 
 
-def draw_decending_acc_requirement(draw, **kwargs):
-    if isinstance(draw, matplotlib.axes.Axes):
-        x_min, x_max = draw.get_xlim()
-        y_min, y_max = draw.get_ylim()
-    else:
-        # assume matplotlib.pyplot
-        x_min, x_max = draw.xlim()
-        y_min, y_max = draw.ylim()
+# return line (xs, ys) in "x_range" and "y_range"
+def get_acc_req_xy(x_range=None, y_range=(0, 1)):
+    x_min, x_max = x_range if x_range else get_x_range()
+    y_min, y_max = y_range
 
+    # just in case
     x_min = max(x_min, 0)
     y_min = max(y_min, 0)
     y_max = min(y_max, 1)
 
-    xs = np.arange(x_min, x_max, 5)
+    xs = np.arange(x_min, x_max + 1, 5)  # "x_max + 1" is to make sure to cover x_max
     ys = acc_requirement(xs)
-    xys = list(zip(xs, ys))
-    xys = list(filter(lambda xy: xy[1] >= y_min, xys))
-    xys = list(filter(lambda xy: xy[1] <= y_max, xys))
-    xs = list(map(lambda xy: xy[0], xys))
-    ys = list(map(lambda xy: xy[1], xys))
 
-    default_plot_arg = {'c': '#303030', 'linestyle': '--', 'linewidth': '2'}
-    draw.plot(xs, ys, **{**default_plot_arg, **kwargs})
+    # cut out of range (e.g. acc=1)
+    keep = np.logical_and(ys >= y_min, ys <= y_max)
+    xs = xs[keep]
+    ys = ys[keep]
 
-
-def x_y_lim(first_hits, margin=0, expand=False,
-            fit_curve=False, clip=[(-inf, -inf), (inf, inf)]):
-    # first_hits: pd.DataFrame / assume {*params, val_acc, end_time}
-    # margin: *fraction* of the span between min and max
-    y_max, x_max = first_hits[['val_acc', 'end_time']].max(axis='index').values
-    y_min, x_min = first_hits[['val_acc', 'end_time']].min(axis='index').values
-
-    if expand:
-        x_min, y_min = 0, 0
-        y_max = 1
-
-    if fit_curve:
-        # might be > 1, when curve(0)
-        y_max = max(min(acc_requirement(0), 1), y_max)
-        x_max = max(acc_requirement_reverse(0), x_max)
-
-    if margin:
-        x_margin = (x_max - x_min) * margin
-        y_margin = (y_max - y_min) * margin
-
-        x_min, x_max = x_min - x_margin, x_max + x_margin
-        y_min, y_max = y_min - y_margin, y_max + y_margin
-
-    x_min = x_min if x_min > clip[0][0] else clip[0][0]
-    y_min = y_min if y_min > clip[0][1] else clip[0][1]
-    x_max = x_max if x_max < clip[1][0] else clip[1][0]
-    y_max = y_max if y_max < clip[1][1] else clip[1][1]
-
-    return (x_min, x_max), (y_min, y_max)  # x_lim, y_lim
+    return xs, ys

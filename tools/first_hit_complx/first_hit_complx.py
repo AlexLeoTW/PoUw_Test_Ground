@@ -2,14 +2,16 @@ import os
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from collections.abc import Iterable
 
 import statistics as stat_tools
 import plot_color as c
-from acc_req_descend import find_first_hit, get_acc_req_xy
+import acc_req_descend as acc
 
 
 figsize = [15, 8]
+# figsize = None
 cnt_zorder = 1
 important_coords = np.array([[0, 0], [0, 1]])  # coolection of points MUST be in the fig
 
@@ -24,8 +26,6 @@ def parse_argv():
                         help='not showing figure, just save them')
     parser.add_argument('-t', '--trans', dest='facecolor', action='store_true',
                         help='use transparent background')
-    parser.add_argument('-s', '--focus', action='store_true',
-                        help='show only range with first hit')
 
     args = parser.parse_args()
 
@@ -55,7 +55,6 @@ def _add_2_important(points):
 
 
 def _get_border(padding=0.1):
-    # print(f'important_coords = {important_coords}')
     max_x = important_coords[:, 0].max()
     min_x = important_coords[:, 0].min()
     padding_x = (max_x - min_x) * padding
@@ -97,14 +96,27 @@ def draw_max_acc_line(ax, statistics, color=None):
 
 def draw_first_hit(ax, statistics, color=None):
     print('\tdraw_first_hit')
-    for xs, ys in stat_tools.gen_log_avg_dots(statistics, y_mode='avg_max'):
+    hit_df = stat_tools.find_first_hits_avg(statistics, acc.acc_requirement)
+    hit_xs, hit_ys = hit_df['end_time'], hit_df['val_acc']
 
-        hit_x, hit_y = find_first_hit(xs, ys)
-        path = ax.scatter(hit_x, hit_y, c=color, edgecolor='white', s=72)
-        _add_2_important([hit_x, hit_y])
-        _set_zorder(path)
+    path = ax.scatter(hit_xs, hit_ys, c=color, edgecolor='white', s=72)
+    _add_2_important(list(zip(hit_xs, hit_ys)))
+    _set_zorder(path)
 
     return path
+
+
+def draw_group(fn, ax, stat_objs, on=True, label=None, **kwargs):
+    colors = c.iter_fg_dot_color() if on else c.iter_fg_dot_off_color()
+    iter_label = iter(label) if label is not None else None
+
+    for stat_obj in stat_objs:
+        color = next(colors)
+
+        obj = fn(ax, stat_obj, color=color, **kwargs)
+
+        if iter_label:
+            _set_label(obj, label=next(iter_label))
 
 
 def _set_label(artist, label):
@@ -116,55 +128,74 @@ def _set_label(artist, label):
         artist.set_label(label)
 
 
-def draw_group(fn, ax, statistics, param, on=True, label=False, **kwargs):
-    param_vals = statistics.params_combination[param].unique()
-    colors = c.iter_fg_dot_color() if on else c.iter_fg_dot_off_color()
-
-    for param_val in param_vals:
-        local_stat = statistics.select_by_values({param: param_val})
-        color = next(colors)
-
-        obj = fn(ax, local_stat, color=color, **kwargs)
-
-        if label:
-            _set_label(obj, label=param_val)
-
-
 def draw_acc_req_line(ax):
     x_min, x_max = ax.get_xlim()
     y_min, y_max = ax.get_ylim()
 
-    xs, ys = get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(ax.get_ylim()))
+    xs, ys = acc.get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(ax.get_ylim()))
 
-    plot_arg = {'c': c.deep_gray, 'linestyle': '--', 'linewidth': '2'}
+    plot_arg = {'c': '#303030', 'linestyle': '--', 'linewidth': '2'}
     lines = ax.plot(xs, ys, **plot_arg)
 
     _set_zorder(lines)
 
 
-def draw_fig(statistics, param, facecolor=c.white, focus=False):
-    fig, ax = plt.subplots(figsize=figsize)
+def draw_acc_growth(ax, statistics, by_param):
+    param_vals = statistics.params_combination[by_param].unique()
+    stat_objs = [statistics.select_by_values({by_param: param_val}) for param_val in param_vals]
 
-    # draw the gray dots (no avg) in the background
     draw_bg_dots(ax, statistics)
-
-    draw_group(draw_avg_dots, ax, statistics, param, on=False)
-    draw_group(draw_max_acc_line, ax, statistics, param, on=False)
-
+    draw_group(draw_avg_dots, ax, stat_objs, on=False)
+    draw_group(draw_max_acc_line, ax, stat_objs, on=False)
+    draw_group(draw_first_hit, ax, stat_objs, label=param_vals, on=True)
     draw_acc_req_line(ax)
 
-    draw_group(draw_first_hit, ax, statistics, param, on=True, label=True)
+    ax.legend(loc='upper left')
+    ax.set_ylabel('val_acc(%)')
+
+
+def draw_box_plot(ax, statistics, by_param):
+    df = stat_tools.find_first_hits(statistics, acc.acc_requirement)
+    colors = c.iter_fg_dot_color()
+
+    data = []
+    param_vals = []
+    for param_val, local_df in df.groupby(by_param).__iter__():
+        data.append(local_df['end_time'])
+        param_vals.append(param_val)
+
+    box_plot = ax.boxplot(data, vert=False, labels=param_vals,
+                          notch=False, patch_artist=True)
+
+    for box, flier, color in zip(box_plot['boxes'], box_plot['fliers'], colors):
+        box.set_facecolor(color)
+        flier.set_markerfacecolor(color)
+
+    ax.set(xlabel='end_time(s)', ylabel=by_param)
+
+
+def draw_fig(statistics, by_param, facecolor=c.white):
+    fig = plt.figure(figsize=figsize)
+
+    grid = gridspec.GridSpec(2, 1)
+    grid.update(wspace=0.025, hspace=0.01)
+
+    ax_acc = fig.add_subplot(grid[0])
+    ax_bar = fig.add_subplot(grid[1], sharex=ax_acc)
+
+    # hide x-ticks
+    ax_acc.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
+
+    draw_acc_growth(ax_acc, statistics, by_param=by_param)
+    draw_box_plot(ax_bar, statistics, by_param=by_param)
 
     fig.set_facecolor(facecolor)
-    ax.set_facecolor(facecolor)
+    ax_acc.set_facecolor(facecolor)
+    ax_bar.set_facecolor(facecolor)
 
-    ax.set(xlabel="end_time(s)", ylabel="val_acc(%)")
-    ax.legend(title=param, loc='upper left')
-
-    if focus:
-        x_lim, y_lim = _get_border()
-        ax.set_xlim(*x_lim)
-        ax.set_ylim(*y_lim)
+    x_lim, y_lim = _get_border()
+    ax_acc.set_xlim(*x_lim)
+    ax_acc.set_ylim(*y_lim)
 
     return fig
 
@@ -178,14 +209,14 @@ def main():
     for param in statistics.params:
         print(f'param = {param}')
 
-        fig = draw_fig(statistics, param=param, facecolor=options.facecolor, focus=options.focus)
+        fig = draw_fig(statistics, by_param=param, facecolor=options.facecolor)
 
         # showing figure in window
         if not options.quiet:
             plt.show()
 
         # save image to the same directory as statistics.csv
-        image_path = os.path.join(base_dir, f'first_hit_{param}.png')
+        image_path = os.path.join(base_dir, f'first_hit_cmpx_{param}.png')
         fig.savefig(image_path)
 
         # close current figure before drawing again
