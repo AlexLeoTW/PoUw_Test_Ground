@@ -108,7 +108,10 @@ def _main():
         values.append(list(num_variables.values()))
 
     startup_time_df = pd.DataFrame(np.array(values), columns=columns)
-    print(startup_time_df)
+
+    # print entire dataframe
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(startup_time_df)
 
     startup_time_df = _drop_all_zero(startup_time_df)
     dfs = _split_df(startup_time_df, by='startup_time_avg', sections=2)
