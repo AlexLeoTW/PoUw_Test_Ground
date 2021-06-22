@@ -81,6 +81,18 @@ class Statistics():
 
         return stat_obj
 
+    def iterrows(self):
+        return self.statistics.iterrows()
+
+    def itergroups(self):
+        idx_group_start, idx_group_end = _group_index(self.statistics, by=self.params)
+
+        for start, end in zip(idx_group_start, idx_group_end):
+            df_slice = self.statistics.loc[start:end]
+            group = self.statistics.iloc[start][self.params].to_dict()
+
+            yield (start, end), group, df_slice
+
     def logs_gen(self):
         # iter through available training logs,
         #   and yield a log for each one of them
