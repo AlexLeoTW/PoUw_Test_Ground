@@ -12,6 +12,7 @@ inf = float('inf')
 def acc_requirement(time_s):
     # return (-0.00003) * time_s + 1
     return -(0.001 * time_s) ** 6 - (0.00003 * time_s) + 1
+    # return np.full_like(time_s, 0.85, dtype=np.double)
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 
@@ -19,23 +20,37 @@ def acc_requirement(time_s):
 def time_acc_pass(acc):
     def acc_req_offset(time):
         return acc_requirement(time) - acc
-    return fsolve(acc_req_offset, 1e-3)[0]
+
+    reverse = fsolve(acc_req_offset, 1e-3, full_output=True)
+    if reverse[2] == 1:
+        # fsolve --> x --> [0]
+        return reverse[0][0]
+    else:
+        return np.nan
 
 
 # return first_hit time
 def find_first_hit(times, accs):
-    # always consider best 'acc' so far
+    # always use best 'acc' so far
     accs = np.maximum.accumulate(accs)
-
-    # just in case a set of training can't passs acc_requirement() entire time
-    max_acc = accs[-1]
-    times = np.append(times, time_acc_pass(max_acc))
-    accs = np.append(accs, max_acc)
 
     passed = accs > acc_requirement(times)
     idx_first_passed = np.argmax(passed)
 
-    return times[idx_first_passed], accs[idx_first_passed]
+    # if any hit is found for given epochs
+    if passed.any():
+        return times[idx_first_passed], accs[idx_first_passed]
+
+    max_acc = accs[-1]
+    t_delay_hit = time_acc_pass(max_acc)
+
+    # if dedayed hit is possiable
+    if t_delay_hit is np.nan:
+        return t_delay_hit, max_acc
+
+    # give up, return 'nan'
+    else:
+        return np.nan, np.nan
 
 
 # return start_time and end_time of the acc-req. plot

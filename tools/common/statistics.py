@@ -267,27 +267,36 @@ def find_first_hits_avg(stat_obj, acc_req, reverse=None,
 
 def _find_first_hit(times, accs, acc_req, reverse=None):
     if reverse is None:
-        reverse = _build_reverse_acc_req(acc_req)
+        reverse = _build_reverse_acc_req(acc_req, full_output=True)
 
-    # always consider best 'acc' so far
+    # always use best 'acc' so far
     accs = np.maximum.accumulate(accs)
-
-    # just in case a set of training can't passs acc_req() entire time
-    max_acc = accs[-1]
-    times = np.append(times, reverse(max_acc))
-    accs = np.append(accs, max_acc)
 
     passed = accs > acc_req(times)
     idx_first_passed = np.argmax(passed)
 
-    return times[idx_first_passed], accs[idx_first_passed]
+    # if any hit is found for given epochs
+    if passed.any():
+        return times[idx_first_passed], accs[idx_first_passed]
+
+    # if dedayed hit is possiable
+    max_acc = accs[-1]
+    if reverse(max_acc)[2] == 1:
+        # fsolve --> x --> [0]
+        return reverse(max_acc)[0][0], max_acc
+    # give up, return 'nan'
+    else:
+        return np.nan, np.nan
 
 
-def _build_reverse_acc_req(acc_req):
+def _build_reverse_acc_req(acc_req, full_output=False):
     def reverse(acc):
         # acc_req(time) == acc  ==>  acc_req(time) - acc == 0
         acc_req_offset = (lambda time: acc_req(time) - acc)
 
-        return fsolve(acc_req_offset, 1e-3)[0]
+        if full_output:
+            return fsolve(acc_req_offset, 1e-3, full_output=True)
+        else:
+            return fsolve(acc_req_offset, 1e-3)[0]
 
     return reverse

@@ -47,10 +47,16 @@ def _set_zorder(artist):
     cnt_zorder = cnt_zorder + 1
 
 
+def _remove_nan_points(points):
+    idx_nan = np.isnan(points).any(axis=1)
+    return points[~idx_nan]
+
+
 def _add_2_important(points):
     global important_coords
 
     points = np.atleast_2d(points)
+    points = _remove_nan_points(points)
     important_coords = np.append(important_coords, points, axis=0)
 
 

@@ -47,10 +47,15 @@ def _set_zorder(artist):
     cnt_zorder = cnt_zorder + 1
 
 
+def _remove_nan_points(points):
+    idx_nan = np.isnan(points).any(axis=1)
+    return points[~idx_nan]
+
 def _add_2_important(points):
     global important_coords
 
     points = np.atleast_2d(points)
+    points = _remove_nan_points(points)
     important_coords = np.append(important_coords, points, axis=0)
 
 
@@ -97,10 +102,16 @@ def draw_max_acc_line(ax, statistics, color=None):
 def draw_first_hit(ax, statistics, color=None):
     print('\tdraw_first_hit')
     hit_df = stat_tools.find_first_hits_avg(statistics, acc.acc_requirement)
+    hit_df = hit_df.dropna(axis='index')
     hit_xs, hit_ys = hit_df['end_time'], hit_df['val_acc']
 
     path = ax.scatter(hit_xs, hit_ys, c=color, edgecolor='white', s=72)
-    _add_2_important(list(zip(hit_xs, hit_ys)))
+
+    if not hit_df.empty:
+        _add_2_important((max(hit_xs), max(hit_ys)))
+    else:
+        _add_2_important((ax.get_xlim()[1], ax.get_ylim()[1]))
+
     _set_zorder(path)
 
     return path
@@ -150,12 +161,13 @@ def draw_acc_growth(ax, statistics, by_param):
     draw_group(draw_first_hit, ax, stat_objs, label=param_vals, on=True)
     draw_acc_req_line(ax)
 
-    ax.legend(loc='upper left')
+    ax.legend(title=by_param, loc='upper left')
     ax.set_ylabel('val_acc(%)')
 
 
 def draw_box_plot(ax, statistics, by_param):
     df = stat_tools.find_first_hits(statistics, acc.acc_requirement)
+    df = df.dropna(axis='index')
     colors = c.iter_fg_dot_color()
 
     data = []
