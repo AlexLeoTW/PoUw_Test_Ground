@@ -143,7 +143,7 @@ def draw_acc_req_line(ax):
     x_min, x_max = ax.get_xlim()
     y_min, y_max = ax.get_ylim()
 
-    xs, ys = acc.get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(ax.get_ylim()))
+    xs, ys = acc.get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(0, 1))
 
     plot_arg = {'c': '#303030', 'linestyle': '--', 'linewidth': '2'}
     lines = ax.plot(xs, ys, **plot_arg)
