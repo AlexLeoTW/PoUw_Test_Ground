@@ -277,7 +277,17 @@ def _find_first_hit(times, accs, acc_req, reverse=None):
 
     # if any hit is found for given epochs
     if passed.any():
-        return times[idx_first_passed], accs[idx_first_passed]
+        if idx_first_passed == 0:
+            return times[idx_first_passed], accs[idx_first_passed]
+
+        prev_acc = accs[idx_first_passed - 1]
+        prev_time = reverse(prev_acc)
+        prev_time = prev_time[0][0] if prev_time[2] == 1 else np.finfo(times[0]).max
+
+        if prev_time < times[idx_first_passed]:
+            return prev_time, prev_acc
+        else:
+            return times[idx_first_passed], accs[idx_first_passed]
 
     # if dedayed hit is possiable
     max_acc = accs[-1]
@@ -293,10 +303,11 @@ def _build_reverse_acc_req(acc_req, full_output=False):
     def reverse(acc):
         # acc_req(time) == acc  ==>  acc_req(time) - acc == 0
         acc_req_offset = (lambda time: acc_req(time) - acc)
+        x_start = 1
 
         if full_output:
-            return fsolve(acc_req_offset, 1e-3, full_output=True)
+            return fsolve(acc_req_offset, x_start, full_output=True)
         else:
-            return fsolve(acc_req_offset, 1e-3)[0]
+            return fsolve(acc_req_offset, x_start)[0]
 
     return reverse
