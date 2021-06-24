@@ -10,9 +10,11 @@ inf = float('inf')
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ Modify This ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 # accuracy requirement decending formulla
 def acc_requirement(time_s):
-    # return (-0.00003) * time_s + 1
-    return -(0.001 * time_s) ** 6 - (0.00003 * time_s) + 1
-    # return np.full_like(time_s, 0.85, dtype=np.double)
+
+    # return np.full_like(time_s, 0.7, dtype=np.double)   # flat
+    # return (-0.003) * (time_s - 480)  + 1   # straight
+    # return -(0.001 * time_s) ** 6 - (0.00003 * time_s) + 1  # curve
+    return - 1.02 ** (time_s - 600) + 1  # curve
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 
