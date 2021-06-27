@@ -281,11 +281,16 @@ def _find_first_hit(times, accs, acc_req, reverse=None):
             return times[idx_first_passed], accs[idx_first_passed]
 
         prev_acc = accs[idx_first_passed - 1]
-        prev_time = reverse(prev_acc)
-        prev_time = prev_time[0][0] if prev_time[2] == 1 else np.finfo(times[0]).max
+        prev_time = times[idx_first_passed - 1]
 
-        if prev_time < times[idx_first_passed]:
-            return prev_time, prev_acc
+        # find possiable hit between epochs
+        solve = reverse(prev_acc, x_start=prev_time)
+        if solve[2] != 1:
+            print(f' WARNING: cannot solve acc_req @y={prev_acc}, {solve}')
+        prev_time_hit = solve[0][0] if solve[2] == 1 else np.finfo(times[0]).max
+
+        if prev_time_hit < times[idx_first_passed]:
+            return prev_time_hit, prev_acc
         else:
             return times[idx_first_passed], accs[idx_first_passed]
 
@@ -300,10 +305,9 @@ def _find_first_hit(times, accs, acc_req, reverse=None):
 
 
 def _build_reverse_acc_req(acc_req, full_output=False):
-    def reverse(acc):
+    def reverse(acc, x_start=1.):
         # acc_req(time) == acc  ==>  acc_req(time) - acc == 0
         acc_req_offset = (lambda time: acc_req(time) - acc)
-        x_start = 1
 
         if full_output:
             return fsolve(acc_req_offset, x_start, full_output=True)
