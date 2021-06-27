@@ -102,20 +102,19 @@ def get_startup_time_df(statistics, avg=True):
         print(f'reading {model_name} ...')
         model = _load_model(base_dir, model_name)
         num_variables = num_trainable_variables_categorized(model)
+        group.update(num_variables)
 
         if avg:
             startup_time_avg = np.average(rows['startup_time'].values)
-            num_variables['startup_time'] = startup_time_avg
-            values.append(list(num_variables.values()))
+            group['startup_time'] = startup_time_avg
+            values.append(group)
 
         else:
             for index, row in rows.iterrows():
-                num_variables['startup_time'] = row['startup_time']
-                values.append(list(num_variables.values()))
+                group['startup_time'] = row['startup_time']
+                values.append(group)
 
-    colnames = ['Conv', 'RNN', 'Dense', 'Other']
-    colnames.append('startup_time_avg' if avg else 'startup_time')
-    startup_time_df = pd.DataFrame(np.array(values), columns=colnames)
+    startup_time_df = pd.DataFrame(values)
 
     return startup_time_df
 
@@ -194,7 +193,6 @@ def draw_fig_2d(startup_time_df, facecolor=c.white):
     startup_time_df = _drop_all_zero_cols(startup_time_df)
 
     num_types = len(startup_time_df.columns) - 1  # 'startup_time'
-    print(startup_time_df)
     print(f'num_types = {num_types}')
     time_label = startup_time_df.columns[-1]
 
@@ -223,6 +221,8 @@ def _main():
     print('writing startup_time.csv ...')
     with open(os.path.join(base_dir, 'startup_time.csv'), 'w') as file:
         file.write(startup_time_df.to_csv())
+
+    startup_time_df = startup_time_df[['Conv', 'RNN', 'Dense', 'Other', 'startup_time']]
 
     if options.mode == '3d':
         print('draw_fig_3d')
