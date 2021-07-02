@@ -1,0 +1,12 @@
+- path: ../../../test_conducted/13.Bulldog_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv
+  hosts: Bulldog
+  params: null
+- path: ../../../test_conducted/14.myjetson_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv
+  hosts: myjetson
+  params: null
+- path: ../../../test_conducted/15.gce-k80-1_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv
+  hosts: gce-k80-1
+  params: null
+- path: ../../../test_conducted/16.PC6_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv
+  hosts: PC6
+  params: null

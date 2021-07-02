@@ -1,0 +1,12 @@
+- path: ../../../test_conducted/17.Bulldog_Keras_CNN_MNIST/Keras_CNN_MNIST/statistics.csv
+  hosts: Bulldog
+  params: null
+- path: ../../../test_conducted/18.myjetson_Keras_CNN_MNIST/Keras_CNN_MNIST/statistics.csv
+  hosts: myjetson
+  params: null
+- path: ../../../test_conducted/19.gce-k80-1_Keras_CNN_MNIST/Keras_CNN_MNIST/statistics.csv
+  hosts: gce-k80-1
+  params: null
+- path: ../../../test_conducted/20.PC6_Keras_CNN_MNIST/Keras_CNN_MNIST/statistics.csv
+  hosts: PC6
+  params: null

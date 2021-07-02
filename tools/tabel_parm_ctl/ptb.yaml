@@ -1,0 +1,3 @@
+- path: ../../../test_conducted/25.Bulldog_Keras_LSTM_PTB/Keras_LSTM_PTB/statistics.csv
+  hosts: Bulldog
+  params: null

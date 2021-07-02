@@ -1,0 +1,9 @@
+- path: ../../../test_conducted/21.Bulldog_RNN_IMDB/Keras_RNN_IMDB/statistics.csv
+  hosts: Bulldog
+  params: null
+- path: ../../../test_conducted/22.myjetson_RNN_IMDB/Keras_RNN_IMDB/statistics.csv
+  hosts: myjetson
+  params: null
+- path: ../../../test_conducted/23.gpuserver_Keras_RNN_IMDB/Keras_RNN_IMDB/statistics.csv
+  hosts: gpuserver
+  params: null
