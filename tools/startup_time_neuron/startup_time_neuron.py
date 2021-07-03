@@ -30,6 +30,8 @@ def parse_argv():
                         help='plot the figure in "3D"')
     parser.add_argument('--2d', dest='mode', action='store_const', const='2d',
                         help='plot the figure in "2D" (default behavior)')
+    parser.add_argument('--drop', metavar='type', nargs='*', type=str, default=[],
+                        help='ignore certain type(s) of neuron')
 
     args = parser.parse_args()
 
@@ -189,8 +191,9 @@ def draw_startup_2d(ax, startup_time_df, type_label, time_label='startup_time'):
     ax.grid(True)
 
 
-def draw_fig_2d(startup_time_df, facecolor=c.white):
+def draw_fig_2d(startup_time_df, facecolor=c.white, drop=[]):
     startup_time_df = _drop_all_zero_cols(startup_time_df)
+    startup_time_df = startup_time_df.drop(columns=drop)
 
     num_types = len(startup_time_df.columns) - 1  # 'startup_time'
     print(f'num_types = {num_types}')
@@ -229,7 +232,7 @@ def _main():
         fig = draw_fig_3d(startup_time_df, facecolor=options.facecolor)
     elif options.mode == '2d':
         print('draw_fig_2d')
-        fig = draw_fig_2d(startup_time_df, facecolor=options.facecolor)
+        fig = draw_fig_2d(startup_time_df, facecolor=options.facecolor, drop=options.drop)
     else:
         print(f'Unknown mode "{mode}".')
 
