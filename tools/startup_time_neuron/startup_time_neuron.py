@@ -92,7 +92,7 @@ def _print_df(df):
             print(df)
 
 
-def get_startup_time_df(statistics, avg=True):
+def get_startup_time_df(statistics, avg=False):
     base_dir = statistics.dirname
     values = []
 
@@ -114,7 +114,7 @@ def get_startup_time_df(statistics, avg=True):
         else:
             for index, row in rows.iterrows():
                 group['startup_time'] = row['startup_time']
-                values.append(group)
+                values.append(group.copy())
 
     startup_time_df = pd.DataFrame(values)
 
