@@ -9,6 +9,9 @@ batch_job.yaml
 *.csv
 *.h5
 
+# generated figs
+*.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

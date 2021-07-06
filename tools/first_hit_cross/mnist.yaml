@@ -1,0 +1,20 @@
+figure:
+  figsize: [15, 8]
+  transparent: False
+  path: first_hit_cross_mnist.png
+  preview: True
+  title: CNN/MNIST
+  legend: 'upper right'
+hosts:
+  Bulldog:
+    path: ../../../test_conducted/17.Bulldog_Keras_CNN_MNIST/Keras_CNN_MNIST/statistics.csv
+    params: Auto
+  myjetson:
+    path: ../../../test_conducted/18.myjetson_Keras_CNN_MNIST/Keras_CNN_MNIST/statistics.csv
+    params: Auto
+  gce-k80-1:
+    path: ../../../test_conducted/19.gce-k80-1_Keras_CNN_MNIST/Keras_CNN_MNIST/statistics.csv
+    params: Auto
+  PC6:
+    path: ../../../test_conducted/20.PC6_Keras_CNN_MNIST/Keras_CNN_MNIST/statistics.csv
+    params: Auto

@@ -1,0 +1,17 @@
+figure:
+  figsize: [15, 8]
+  transparent: False
+  path: first_hit_cross_imdb.png
+  preview: True
+  title: RNN/IMDB
+  legend: 'upper right'
+hosts:
+  Bulldog:
+    path: ../../../test_conducted/21.Bulldog_RNN_IMDB/Keras_RNN_IMDB/statistics.csv
+    params: Auto
+  myjetson:
+    path: ../../../test_conducted/22.myjetson_RNN_IMDB/Keras_RNN_IMDB/statistics.csv
+    params: Auto
+  gpuserver:
+    path: ../../../test_conducted/23.gpuserver_Keras_RNN_IMDB/Keras_RNN_IMDB/statistics.csv
+    params: Auto

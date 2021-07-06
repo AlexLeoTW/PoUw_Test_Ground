@@ -1,0 +1,20 @@
+figure:
+  figsize: [15, 8]
+  transparent: False
+  path: first_hit_cross_cifar.png
+  preview: True
+  title: CNN/CIFAR10
+  legend: 'upper right'
+hosts:
+  Bulldog:
+    path: ../../../test_conducted/13.Bulldog_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv
+    params: Auto
+  myjetson:
+    path: ../../../test_conducted/14.myjetson_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv
+    params: Auto
+  gce-k80-1:
+    path: ../../../test_conducted/15.gce-k80-1_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv
+    params: Auto
+  PC6:
+    path: ../../../test_conducted/16.PC6_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv
+    params: Auto
