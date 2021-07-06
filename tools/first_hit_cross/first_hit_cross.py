@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from collections.abc import Iterable
+import progressbar
 
 from config import read_config
 import statistics as stat_tools
@@ -121,6 +122,7 @@ def collect_hits(config):
     hit_accs_all = []
 
     for host in config['hosts']:
+        print(f'processing host="{host}"')
         statistics = stat_tools.Statistics(**config['hosts'][host])
         hit_df = stat_tools.find_first_hits(statistics, acc.acc_requirement,
                                             reverse=acc.reverse_acc_req)
@@ -133,6 +135,38 @@ def collect_hits(config):
         hit_accs_all.append(hit_accs)
 
     return hostname_all, hit_times_all, hit_accs_all
+
+
+def draw_winning_annotate(ax, chance):
+    x_lim, y_lim = _get_border()
+    offset = x_lim[0] + (x_lim[1] - x_lim[0]) * 0.01
+
+    for idx, c_val in zip(range(len(chance)), chance.values()):
+        ax.text(x=offset, y=(idx + 1), s=f'~{c_val:.2%} chance', verticalalignment="center")
+
+
+def calc_winning_chance(hostname_all, hit_times_all, sample=10000):
+    grids = np.meshgrid(*hit_times_all)
+    sample = min(grids[0].size, sample)
+
+    # [ [host2_times... : 10000], [host2_times... : 10000], [host3_times... : 10000] ]
+    times = [np.random.choice(grid.flatten(), size=sample) for grid in grids]
+    times = np.array(times)
+
+    # [min_time1, min_time2...]
+    times_min = times.min(axis=0)
+    # [ [False...], [False...], [True...] ]
+    winning = (times == times_min)  # numpy auto-expand
+
+    win_sum = winning.sum(axis=0)
+    weighted = winning / win_sum
+
+    win_total = weighted.sum(axis=1)
+    chance = win_total / np.sum(win_total)
+
+    chance = dict(zip(hostname_all, chance))
+
+    return chance
 
 
 def draw_fig(config):
@@ -149,8 +183,10 @@ def draw_fig(config):
     draw_bg_dots(ax_acc, config)
     draw_first_hits(ax_acc, hostname_all, hit_times_all, hit_accs_all)
     draw_acc_req_line(ax_acc)
-
     draw_box_plot(ax_bar, hostname_all, hit_times_all)
+
+    chance = calc_winning_chance(hostname_all, hit_times_all)
+    draw_winning_annotate(ax_bar, chance)
 
     fig.set_facecolor(config['figure']['facecolor'])
     ax_acc.set_facecolor(config['figure']['facecolor'])
