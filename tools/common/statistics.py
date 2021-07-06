@@ -265,9 +265,20 @@ def find_first_hits_avg(stat_obj, acc_req, reverse=None,
     return df
 
 
+def _find_first_hit_between_eposchs(times, accs, idx_first_passed, reverse):
+    if idx_first_passed == 0:
+        return times[idx_first_passed], accs[idx_first_passed]
+
+    prev_acc = accs[idx_first_passed - 1]
+    prev_time = times[idx_first_passed - 1]
+
+    solve = reverse(prev_acc, x_start=[prev_time, 1.])
+
+    return solve, prev_acc
+
+
 def _find_first_hit(times, accs, acc_req, reverse=None):
-    if reverse is None:
-        reverse = _build_reverse_acc_req(acc_req, full_output=True)
+    reverse = _wrap_reverse_acc_req(acc_req, reverse)
 
     # always use best 'acc' so far
     accs = np.maximum.accumulate(accs)
@@ -277,48 +288,48 @@ def _find_first_hit(times, accs, acc_req, reverse=None):
 
     # if any hit is found for given epochs
     if passed.any():
-        if idx_first_passed == 0:
+        hit_time, hit_acc = _find_first_hit_between_eposchs(times, accs,
+                                                            idx_first_passed,
+                                                            reverse)
+
+        if np.isnan(hit_time):
             return times[idx_first_passed], accs[idx_first_passed]
-
-        prev_acc = accs[idx_first_passed - 1]
-        prev_time = times[idx_first_passed - 1]
-
-        # find possiable hit between epochs
-        solve = reverse(prev_acc, x_start=[prev_time, 1.])
-        if solve[2] != 1:
-            print(f' WARNING: cannot solve acc_req @y={prev_acc}, {solve}')
-        prev_time_hit = solve[0][0] if solve[2] == 1 else np.finfo(times[0]).max
-
-        if prev_time_hit < times[idx_first_passed]:
-            return prev_time_hit, prev_acc
         else:
-            return times[idx_first_passed], accs[idx_first_passed]
+            return hit_time, hit_acc
+
+    max_acc = accs[-1]
+    max_time = times[-1]
+    hit_time_delayed = reverse(max_acc, x_start=[max_time, 1.])
 
     # if dedayed hit is possiable
-    max_acc = accs[-1]
-    if reverse(max_acc)[2] == 1:
-        # fsolve --> x --> [0]
-        return reverse(max_acc)[0][0], max_acc
+    if not np.isnan(hit_time_delayed):
+        return hit_time_delayed, max_acc
     # give up, return 'nan'
     else:
         return np.nan, np.nan
 
 
-def _build_reverse_acc_req(acc_req, full_output=False):
+def _wrap_reverse_acc_req(acc_req, reverse=None):
+    if reverse is not None and reverse(0.1) is not None:
+        return (lambda acc, x_start=None: reverse(acc))
+
     def reverse(acc, x_start=1.):
+        # support multiple 'x_start' values
+        x_start = np.atleast_1d(x_start)
+
         # acc_req(time) == acc  ==>  acc_req(time) - acc == 0
         acc_req_offset = (lambda time: acc_req(time) - acc)
 
-        x_start = np.atleast_1d(x_start)
-
         for x in x_start:
             solve = fsolve(acc_req_offset, x0=x, full_output=True)
-
+            # if a solve is found
             if solve[2] == 1:
                 break
 
-        if full_output:
-            return solve
+        # if NO solve is found
+        if solve[2] != 1:
+            perror(f' WARNING: cannot solve acc_req @y={prev_acc}, {solve}')
+            return np.nan
         else:
             return solve[0][0]
 

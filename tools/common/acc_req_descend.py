@@ -15,6 +15,13 @@ def acc_requirement(time_s):
     # return (-0.003) * (time_s - 480)  + 1   # straight
     # return -(0.001 * time_s) ** 6 - (0.00003 * time_s) + 1  # curve
     return - 1.02 ** (time_s - 600) + 1  # curve
+
+
+def reverse_acc_req(acc):
+    # None   # flat
+    # return (acc - 1) * -1000 / 3 + 480   # flat
+    # None   # curve
+    return np.log(1 - acc) / np.log(1.02) + 600  # curve
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 
