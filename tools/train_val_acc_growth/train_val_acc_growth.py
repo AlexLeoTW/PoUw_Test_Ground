@@ -58,6 +58,8 @@ def draw_fig(group, logs, facecolor=c.white):
     ax.set_facecolor(facecolor)
     fig.set_facecolor(facecolor)
 
+    fig.tight_layout()
+
     return fig
 
 

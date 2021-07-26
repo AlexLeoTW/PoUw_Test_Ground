@@ -172,7 +172,9 @@ def draw_fig(statistics, param, facecolor=c.white, focus=False):
     ax.set_facecolor(facecolor)
 
     ax.set(xlabel="end_time(s)", ylabel="val_acc(%)")
-    ax.legend(title=param, loc='upper left')
+    ax.legend(title=param, loc='upper right')
+
+    fig.tight_layout()
 
     if focus:
         x_lim, y_lim = _get_border()

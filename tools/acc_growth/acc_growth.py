@@ -77,6 +77,8 @@ def draw_fig(statistics, param, style='dot', max=False, facecolor=c.white):
 
     ax.legend(title=param, loc='lower right')
 
+    fig.tight_layout()
+
     return fig
 
 

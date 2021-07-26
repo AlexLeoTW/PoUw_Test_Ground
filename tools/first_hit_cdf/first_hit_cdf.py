@@ -109,6 +109,8 @@ def draw_fig(statistics, by_param, facecolor=c.white):
     ax.set(xlabel="end_time(s)", ylabel="Cumulative Distribution(%)")
     ax.legend(title=by_param, loc='upper left')
 
+    fig.tight_layout()
+
     return fig
 
 

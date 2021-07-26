@@ -170,9 +170,9 @@ def calc_winning_chance(hostname_all, hit_times_all, sample=10000):
 
 
 def draw_fig(config):
-    fig = plt.figure(figsize=figsize)
+    fig = plt.figure(figsize=figsize, constrained_layout=True)
 
-    grid = gridspec.GridSpec(2, 1)
+    grid = gridspec.GridSpec(2, 1, figure=fig)
     grid.update(wspace=0.025, hspace=0.01)
 
     ax_acc = fig.add_subplot(grid[0])

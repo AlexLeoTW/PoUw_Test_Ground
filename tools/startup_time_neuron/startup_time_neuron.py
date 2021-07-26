@@ -209,6 +209,8 @@ def draw_fig_2d(startup_time_df, facecolor=c.white, drop=[]):
     for ax in axs:
         ax.set_facecolor(facecolor)
 
+    fig.tight_layout()
+
     return fig
 
 

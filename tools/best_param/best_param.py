@@ -185,6 +185,8 @@ def draw_fig(statistics, facecolor=c.white, focus=False):
     else:
         ax.set_ylim(bottom=0)
 
+    fig.tight_layout()
+
     return fig
 
 

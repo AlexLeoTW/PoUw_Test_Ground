@@ -145,7 +145,7 @@ def draw_acc_req_line(ax):
 
     xs, ys = acc.get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(0, 1))
 
-    plot_arg = {'c': '#303030', 'linestyle': '--', 'linewidth': '2'}
+    plot_arg = {'c': c.deep_gray, 'linestyle': '--', 'linewidth': '2'}
     lines = ax.plot(xs, ys, **plot_arg)
 
     _set_zorder(lines)
@@ -187,9 +187,9 @@ def draw_box_plot(ax, statistics, by_param):
 
 
 def draw_fig(statistics, by_param, facecolor=c.white):
-    fig = plt.figure(figsize=figsize)
+    fig = plt.figure(figsize=figsize, constrained_layout=True)
 
-    grid = gridspec.GridSpec(2, 1)
+    grid = gridspec.GridSpec(2, 1, figure=fig)
     grid.update(wspace=0.025, hspace=0.01)
 
     ax_acc = fig.add_subplot(grid[0])

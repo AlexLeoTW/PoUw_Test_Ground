@@ -117,9 +117,9 @@ def draw_fig(statistics, by_param, facecolor=c.white):
     hit_df = stat_tools.find_first_hits(statistics, acc.acc_requirement)
     num_groups = hit_df.loc[:, by_param].nunique()
 
-    fig = plt.figure(figsize=[10, 4*num_groups])
+    fig = plt.figure(figsize=[10, 4*num_groups], constrained_layout=True)
 
-    grid = gridspec.GridSpec(num_groups, 1)
+    grid = gridspec.GridSpec(num_groups, 1, figure=fig)
     grid.update(wspace=0.025, hspace=0.01)
 
     axs = [fig.add_subplot(spec) for spec in grid]

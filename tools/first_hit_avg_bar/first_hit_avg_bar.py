@@ -83,6 +83,8 @@ def draw_fig(first_hit_df, param, facecolor=c.white):
     fig.set_facecolor(facecolor)
     ax.set_facecolor(facecolor)
 
+    fig.tight_layout()
+
     return fig
 
 
