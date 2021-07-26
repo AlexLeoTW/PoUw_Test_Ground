@@ -6,7 +6,7 @@ from collections.abc import Iterable
 
 import statistics as stat_tools
 import plot_color as c
-from acc_req_descend import find_first_hit, get_acc_req_xy
+import acc_req_descend as acc
 
 
 figsize = [15, 8]
@@ -103,12 +103,19 @@ def draw_max_acc_line(ax, statistics, color=None):
 
 def draw_first_hit(ax, statistics, color=None):
     print('\tdraw_first_hit')
-    for xs, ys in stat_tools.gen_log_avg_dots(statistics, y_mode='avg_max'):
+    hit_df = stat_tools.find_first_hits_avg(statistics, acc.acc_requirement)
+    hit_df = hit_df.dropna(axis='index')
+    hit_xs, hit_ys = hit_df['end_time'], hit_df['val_acc']
 
-        hit_x, hit_y = find_first_hit(xs, ys)
-        path = ax.scatter(hit_x, hit_y, c=color, edgecolor='white', s=72)
-        _add_2_important([hit_x, hit_y])
-        _set_zorder(path)
+    path = ax.scatter(hit_xs, hit_ys, c=color, edgecolor='white', s=72)
+
+    # in case no hit was found
+    if not hit_df.empty:
+        _add_2_important((max(hit_xs), max(hit_ys)))
+    else:
+        _add_2_important((ax.get_xlim()[1], ax.get_ylim()[1]))
+
+    _set_zorder(path)
 
     return path
 
@@ -140,7 +147,7 @@ def draw_acc_req_line(ax):
     x_min, x_max = ax.get_xlim()
     y_min, y_max = ax.get_ylim()
 
-    xs, ys = get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(ax.get_ylim()))
+    xs, ys = acc.get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(0, 1))
 
     plot_arg = {'c': c.deep_gray, 'linestyle': '--', 'linewidth': '2'}
     lines = ax.plot(xs, ys, **plot_arg)

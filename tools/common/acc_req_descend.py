@@ -10,56 +10,18 @@ inf = float('inf')
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ Modify This ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 # accuracy requirement decending formulla
 def acc_requirement(time_s):
-
-    # return np.full_like(time_s, 0.7, dtype=np.double)   # flat
-    # return (-0.003) * (time_s - 480)  + 1   # straight
-    # return -(0.001 * time_s) ** 6 - (0.00003 * time_s) + 1  # curve
-    return - 1.02 ** (time_s - 600) + 1  # curve
+    # return np.full_like(time_s, 0.7, dtype=np.double)         # flat
+    # return (-0.003) * (time_s - 480)  + 1                     # straight
+    # return -(0.001 * time_s) ** 6 - (0.00003 * time_s) + 1    # curve
+    return - 1.02 ** (time_s - 600) + 1                         # curve2
 
 
 def reverse_acc_req(acc):
-    # None   # flat
-    # return (acc - 1) * -1000 / 3 + 480   # flat
-    # None   # curve
-    return np.log(1 - acc) / np.log(1.02) + 600  # curve
+    # return None                                               # flat
+    # return (acc - 1) * -1000 / 3 + 480                        # flat
+    # return None                                               # curve
+    return np.log(1 - acc) / np.log(1.02) + 600                 # curve2
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
-
-# reversed acc_requirement function (takes acc as input)
-def time_acc_pass(acc):
-    def acc_req_offset(time):
-        return acc_requirement(time) - acc
-
-    reverse = fsolve(acc_req_offset, 1e-3, full_output=True)
-    if reverse[2] == 1:
-        # fsolve --> x --> [0]
-        return reverse[0][0]
-    else:
-        return np.nan
-
-
-# return first_hit time
-def find_first_hit(times, accs):
-    # always use best 'acc' so far
-    accs = np.maximum.accumulate(accs)
-
-    passed = accs > acc_requirement(times)
-    idx_first_passed = np.argmax(passed)
-
-    # if any hit is found for given epochs
-    if passed.any():
-        return times[idx_first_passed], accs[idx_first_passed]
-
-    max_acc = accs[-1]
-    t_delay_hit = time_acc_pass(max_acc)
-
-    # if dedayed hit is possiable
-    if t_delay_hit is np.nan:
-        return t_delay_hit, max_acc
-
-    # give up, return 'nan'
-    else:
-        return np.nan, np.nan
 
 
 # return start_time and end_time of the acc-req. plot
