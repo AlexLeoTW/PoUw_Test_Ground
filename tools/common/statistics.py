@@ -328,7 +328,7 @@ def _wrap_reverse_acc_req(acc_req, reverse=None):
 
         # if NO solve is found
         if solve[2] != 1:
-            perror(f' WARNING: cannot solve acc_req @y={prev_acc}, {solve}')
+            perror(f' WARNING: cannot solve acc_req @y={acc}, {solve}')
             return np.nan
         else:
             return solve[0][0]
