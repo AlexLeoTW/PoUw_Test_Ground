@@ -10,7 +10,8 @@ default_config = {
         'path': None,       # f'first_hit_cross_{config}.png'
         'preview': True,
         'title': None,
-        'legend': 'upper left'
+        'legend': 'upper left',
+        'dark_mode': False
     },
     'hosts': {}
 }
@@ -29,6 +30,9 @@ def read_config(path):
     for host in config['hosts']:
         if config['hosts'][host]['params'] == 'Auto':
             config['hosts'][host]['params'] = None
+
+    if config['figure']['dark_mode']:
+        c.dark_mode()
 
     if config['figure']['transparent']:
         config['figure']['facecolor'] = c.transparent

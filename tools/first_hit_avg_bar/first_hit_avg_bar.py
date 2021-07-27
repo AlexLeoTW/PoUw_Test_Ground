@@ -24,8 +24,13 @@ def parse_argv():
                         help='not showing figure, just save them')
     parser.add_argument('-t', '--trans', dest='facecolor', action='store_true',
                         help='use transparent background')
+    parser.add_argument('--dark', action='store_true',
+                        help='use dark mode')
 
     args = parser.parse_args()
+
+    if args.dark:
+        c.dark_mode()
 
     args.facecolor = c.transparent if args.facecolor else c.facecolor
 
@@ -74,7 +79,7 @@ def draw_fig(first_hit_df, param, facecolor=c.white):
     param_vals, avg_end_times, stddiv_end_times = __extract__(first_hit_df, param)
 
     bars = ax.bar(param_vals, avg_end_times, yerr=stddiv_end_times,
-                  color=c.fg_dot_color)
+                  color=c.fg_dot_color, ecolor=c.ecolor)
     autolabel(ax, bars)
 
     ax.set_xlabel(param)

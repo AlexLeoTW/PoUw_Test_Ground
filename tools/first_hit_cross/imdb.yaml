@@ -5,6 +5,7 @@ figure:
   preview: True
   title: RNN/IMDB
   legend: 'upper right'
+  dark_mode: False
 hosts:
   Bulldog:
     path: ../../../test_conducted/21.Bulldog_RNN_IMDB/Keras_RNN_IMDB/statistics.csv

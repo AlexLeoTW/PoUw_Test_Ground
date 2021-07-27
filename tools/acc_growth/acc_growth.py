@@ -23,8 +23,13 @@ def parse_argv():
                         help='plot with "line" or "dot"')
     parser.add_argument('--max', action='store_true',
                         help='plot with accumulated max accuracy')
+    parser.add_argument('--dark', action='store_true',
+                        help='use dark mode')
 
     args = parser.parse_args()
+
+    if args.dark:
+        c.dark_mode()
 
     args.facecolor = c.transparent if args.facecolor else c.facecolor
 

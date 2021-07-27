@@ -98,8 +98,7 @@ def draw_acc_req_line(ax):
 
     xs, ys = acc.get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(0, 1))
 
-    plot_arg = {'c': '#303030', 'linestyle': '--', 'linewidth': '2'}
-    lines = ax.plot(xs, ys, **plot_arg)
+    lines = ax.plot(xs, ys, **c.acc_req_line)
 
     _set_zorder(lines)
 

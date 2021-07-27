@@ -25,8 +25,13 @@ def parse_argv():
                         help='not showing figure, just save them')
     parser.add_argument('-t', '--trans', dest='facecolor', action='store_true',
                         help='use transparent background')
+    parser.add_argument('--dark', action='store_true',
+                        help='use dark mode')
 
     args = parser.parse_args()
+
+    if args.dark:
+        c.dark_mode()
 
     args.facecolor = c.transparent if args.facecolor else c.facecolor
 

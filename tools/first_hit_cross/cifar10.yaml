@@ -5,6 +5,7 @@ figure:
   preview: True
   title: CNN/CIFAR10
   legend: 'upper right'
+  dark_mode: False
 hosts:
   Bulldog:
     path: ../../../test_conducted/13.Bulldog_Keras_CNN_CIFAR10/Keras_CNN_CIFAR10/statistics.csv

@@ -26,8 +26,13 @@ def parse_argv():
                         help='use transparent background')
     parser.add_argument('-s', '--focus', action='store_true',
                         help='show only range with first hit')
+    parser.add_argument('--dark', action='store_true',
+                        help='use dark mode')
 
     args = parser.parse_args()
+
+    if args.dark:
+        c.dark_mode()
 
     args.facecolor = c.transparent if args.facecolor else c.facecolor
 
@@ -134,8 +139,7 @@ def draw_acc_req_line(ax):
     print('draw_acc_req_line')
     xs, ys = acc.get_acc_req_xy(x_range=(ax.get_xlim()), y_range=(ax.get_ylim()))
 
-    plot_arg = {'c': c.deep_gray, 'linestyle': '--', 'linewidth': '2'}
-    lines = ax.plot(xs, ys, **plot_arg)
+    lines = ax.plot(xs, ys, **c.acc_req_line)
 
     _set_zorder(lines)
 

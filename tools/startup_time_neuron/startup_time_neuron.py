@@ -32,8 +32,13 @@ def parse_argv():
                         help='plot the figure in "2D" (default behavior)')
     parser.add_argument('--drop', metavar='type', nargs='*', type=str, default=[],
                         help='ignore certain type(s) of neuron')
+    parser.add_argument('--dark', action='store_true',
+                        help='use dark mode')
 
     args = parser.parse_args()
+
+    if args.dark:
+        c.dark_mode()
 
     args.facecolor = c.transparent if args.facecolor else c.facecolor
     args.mode = '2d' if args.mode is None else args.mode
